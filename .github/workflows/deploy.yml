@@ -1,0 +1,87 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: production-deploy-uleeb-web
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      # Own file, own sites-available entry (uleeb-web) — deliberately never touches
+      # twedot-backend's or uleeb-api's own nginx configs, same reasoning as
+      # uleeb-api's own deploy workflow.
+      - name: Copy nginx config to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "nginx.conf"
+          target: "~/uleeb-web"
+
+      # dist/ ships as a whole directory every deploy — the remote script below
+      # atomically swaps it in (build into a fresh dir, then rename) so nginx never
+      # serves a half-replaced set of files mid-deploy.
+      - name: Copy build output to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "dist/*"
+          target: "~/uleeb-web/dist_new"
+          strip_components: 1
+
+      - name: Activate new build & reload nginx
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          command_timeout: 5m
+          script_stop: true
+          script: |
+            set -e
+            cd ~/uleeb-web
+            rm -rf dist_old
+            [ -d dist ] && mv dist dist_old
+            mv dist_new dist
+            rm -rf dist_old
+
+            sudo cp nginx.conf /etc/nginx/sites-available/uleeb-web
+            sudo ln -sf /etc/nginx/sites-available/uleeb-web /etc/nginx/sites-enabled/uleeb-web
+            # Guarded (not `set -e`'d past this point) because the very first deploy
+            # runs before uleeb.twedot.com has a cert yet — nginx -t fails until
+            # certbot has run once (see README), and that must not abort the deploy,
+            # which doesn't depend on nginx being right yet.
+            if sudo nginx -t 2>&1; then
+              sudo systemctl reload nginx
+              echo "nginx config updated and reloaded"
+            else
+              echo "nginx config test failed (likely no cert yet for uleeb.twedot.com) — skipping reload, continuing deploy"
+            fi
+
+            echo "Deployed. Files at ~/uleeb-web/dist:"
+            ls -la ~/uleeb-web/dist

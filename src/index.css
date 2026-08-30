@@ -1,0 +1,147 @@
+/* ── Theme Variables ──────────────────────────────────────────────────────
+   uleeb's own palette (mirrors constants/theme.ts in the mobile app) —
+   monochrome black/white/cream, with green/red as the only meaningful
+   accents (accepted/rejected). Deliberately not Twedot's purple: same
+   STRUCTURAL patterns as twedot-site (nav, pill buttons, section pills,
+   card containers, footer layout), re-skinned in uleeb's own established
+   product colors, the same way the pattern is meant to be reused. */
+:root {
+  --bg:           #F7F6F2;
+  --bg-alt:       #F0EFE9;
+  --bg-card:      #FFFFFF;
+  --text:         #181614;
+  --text-muted:   #5B5750;
+  --text-faint:   #9B968C;
+  --text-inv:     #FFFFFF;
+  --border:       #E6E3DB;
+  --border-sub:   #EFEDE6;
+  --ink:          #131110;
+  --green:        #2F8F55;
+  --green-bg:     #E3F5EA;
+  --red:          #C8402A;
+  --red-bg:       #FBE9E5;
+  --shadow:       0 4px 24px rgba(19,17,16,0.06);
+  --shadow-lg:    0 16px 48px rgba(19,17,16,0.12);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; overflow-x: clip; }
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; }
+img { max-width: 100%; display: block; }
+#root { width: 100%; }
+[id] { scroll-margin-top: 84px; }
+
+.display {
+  font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* ── Keyframes ────────────────────────────────────────────────────────── */
+@keyframes fadeUp   { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes floatCard { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-14px) rotate(-3deg); } }
+@keyframes floatCard2 { 0%, 100% { transform: translateY(0) rotate(3deg); } 50% { transform: translateY(-18px) rotate(3deg); } }
+
+/* ── Scroll reveal — content is always visible, this just adds polish ─── */
+.reveal { opacity: 1; transform: translateY(14px); transition: transform 0.6s ease, opacity 0.6s ease; }
+.reveal.visible { transform: none; }
+.reveal.delay-1 { transition-delay: 0.08s; }
+.reveal.delay-2 { transition-delay: 0.16s; }
+.reveal.delay-3 { transition-delay: 0.24s; }
+
+/* ── Nav ──────────────────────────────────────────────────────────────── */
+.nav-wrap { padding: 0 48px; }
+.nav-link {
+  color: var(--text-muted);
+  font-size: 14.5px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 8px;
+  transition: background 0.2s, color 0.2s;
+}
+.nav-link:hover { background: var(--bg-alt); color: var(--text); }
+
+/* ── Buttons ──────────────────────────────────────────────────────────── */
+.btn-hero-black {
+  background: var(--ink); color: #fff;
+  border: none; border-radius: 999px;
+  padding: 18px 44px; font-weight: 700; font-size: 17px;
+  cursor: pointer; font-family: inherit;
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.btn-hero-black:hover { transform: translateY(-2px); box-shadow: 0 20px 52px rgba(19,17,16,0.2); }
+
+.btn-hero-outline {
+  background: #fff; color: var(--ink);
+  border: 1.5px solid var(--border); border-radius: 999px;
+  padding: 18px 40px; font-weight: 700; font-size: 17px;
+  cursor: pointer; font-family: inherit;
+  transition: transform 0.2s, border-color 0.2s;
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.btn-hero-outline:hover { transform: translateY(-2px); border-color: var(--ink); }
+
+.btn-primary {
+  background: var(--ink); color: #fff;
+  border: none; border-radius: 999px;
+  padding: 14px 30px; font-weight: 700; font-size: 15px;
+  cursor: pointer; font-family: inherit;
+  transition: opacity 0.2s;
+}
+.btn-primary:hover { opacity: 0.85; }
+
+/* ── Section pill ─────────────────────────────────────────────────────── */
+.section-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--bg-alt); border: 1px solid var(--border);
+  border-radius: 20px; padding: 5px 16px;
+  color: var(--text-muted); font-size: 12px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+
+/* ── Cards ────────────────────────────────────────────────────────────── */
+.feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+
+/* ── Footer ───────────────────────────────────────────────────────────── */
+.footer-link { color: var(--text-muted); font-size: 14px; line-height: 2.6; display: block; transition: color 0.2s; }
+.footer-link:hover { color: var(--text); }
+.social-link { color: var(--text-muted); transition: color 0.2s, transform 0.2s; display: flex; align-items: center; }
+.social-link:hover { color: var(--ink); transform: translateY(-2px); }
+
+/* ── Responsive ───────────────────────────────────────────────────────── */
+@media (max-width: 960px) {
+  .hero-row { flex-direction: column !important; text-align: center; }
+  .hero-visual { width: 100% !important; margin-top: 48px; }
+  .hero-cta { justify-content: center !important; }
+  .features-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .how-row { flex-direction: column !important; gap: 32px !important; }
+  .footer-inner { flex-direction: column !important; gap: 40px !important; }
+  .nav-wrap { padding: 0 24px !important; }
+}
+
+@media (max-width: 640px) {
+  .nav-links { display: none !important; }
+  .features-grid { grid-template-columns: 1fr !important; }
+  .hero-split { padding: 100px 20px 48px !important; }
+  .btn-hero-black, .btn-hero-outline { width: 100%; justify-content: center; padding: 16px 28px !important; font-size: 16px !important; }
+  .hero-cta { flex-direction: column; width: 100%; }
+  .nav-wrap { padding: 0 16px !important; }
+  .footer-wrap { padding: 48px 16px 0 !important; }
+}
