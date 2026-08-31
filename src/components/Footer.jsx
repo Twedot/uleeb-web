@@ -1,8 +1,8 @@
 const LINKS = [
   { title: 'Product', items: [
-    { label: 'Features', href: '#features' },
     { label: 'How it works', href: '#how-it-works' },
-    { label: 'For landlords', href: '#landlords' },
+    { label: 'Listings', href: '#features' },
+    { label: 'Get the app', href: '#cta' },
   ]},
   { title: 'Company', items: [
     { label: 'Powered by Twedot', href: 'https://twedot.com', external: true },

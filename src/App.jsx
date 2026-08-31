@@ -1,7 +1,8 @@
 import Nav from './components/Nav';
 import Hero from './components/Hero';
-import Features from './components/Features';
-import HowItWorks from './components/HowItWorks';
+import MissionBand from './components/MissionBand';
+import StickyScroll from './components/StickyScroll';
+import ListingParade from './components/ListingParade';
 import CTASection from './components/CTASection';
 import Footer from './components/Footer';
 
@@ -10,8 +11,9 @@ export default function App() {
     <>
       <Nav />
       <Hero />
-      <Features />
-      <HowItWorks />
+      <MissionBand />
+      <StickyScroll />
+      <ListingParade />
       <CTASection />
       <Footer />
     </>

@@ -1,9 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 
 const NAV_LINKS = [
-  { label: 'Features', href: '#features' },
   { label: 'How it works', href: '#how-it-works' },
-  { label: 'For landlords', href: '#landlords' },
+  { label: 'Listings', href: '#features' },
 ];
 
 const MenuIcon = () => (

@@ -48,6 +48,12 @@ img { max-width: 100%; display: block; }
 @keyframes fadeUp   { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 @keyframes floatCard { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-14px) rotate(-3deg); } }
 @keyframes floatCard2 { 0%, 100% { transform: translateY(0) rotate(3deg); } 50% { transform: translateY(-18px) rotate(3deg); } }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ── Marquee ──────────────────────────────────────────────────────────── */
+.marquee-wrap { overflow: hidden; width: 100%; max-width: 100vw; }
+.marquee-track { display: flex; gap: 20px; animation: marquee 36s linear infinite; width: max-content; }
+.marquee-wrap:hover .marquee-track { animation-play-state: paused; }
 
 /* ── Scroll reveal — content is always visible, this just adds polish ─── */
 .reveal { opacity: 1; transform: translateY(14px); transition: transform 0.6s ease, opacity 0.6s ease; }
@@ -90,6 +96,14 @@ img { max-width: 100%; display: block; }
 }
 .btn-hero-outline:hover { transform: translateY(-2px); border-color: var(--ink); }
 
+.btn-hero-white {
+  background: #fff; color: var(--ink);
+  border: none; cursor: pointer; font-family: inherit;
+  font-weight: 700; font-size: 15px;
+  transition: opacity 0.2s;
+}
+.btn-hero-white:hover { opacity: 0.9; }
+
 .btn-primary {
   background: var(--ink); color: #fff;
   border: none; border-radius: 999px;
@@ -108,17 +122,6 @@ img { max-width: 100%; display: block; }
   letter-spacing: 0.08em; text-transform: uppercase;
 }
 
-/* ── Cards ────────────────────────────────────────────────────────────── */
-.feature-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 32px;
-  box-shadow: var(--shadow);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
-
 /* ── Footer ───────────────────────────────────────────────────────────── */
 .footer-link { color: var(--text-muted); font-size: 14px; line-height: 2.6; display: block; transition: color 0.2s; }
 .footer-link:hover { color: var(--text); }
@@ -130,18 +133,17 @@ img { max-width: 100%; display: block; }
   .hero-row { flex-direction: column !important; text-align: center; }
   .hero-visual { width: 100% !important; margin-top: 48px; }
   .hero-cta { justify-content: center !important; }
-  .features-grid { grid-template-columns: repeat(2, 1fr) !important; }
-  .how-row { flex-direction: column !important; gap: 32px !important; }
   .footer-inner { flex-direction: column !important; gap: 40px !important; }
   .nav-wrap { padding: 0 24px !important; }
+  .section-header-pad, .vendor-header, .sticky-col { padding-left: 24px !important; padding-right: 24px !important; }
 }
 
 @media (max-width: 640px) {
   .nav-links { display: none !important; }
-  .features-grid { grid-template-columns: 1fr !important; }
   .hero-split { padding: 100px 20px 48px !important; }
   .btn-hero-black, .btn-hero-outline { width: 100%; justify-content: center; padding: 16px 28px !important; font-size: 16px !important; }
   .hero-cta { flex-direction: column; width: 100%; }
   .nav-wrap { padding: 0 16px !important; }
   .footer-wrap { padding: 48px 16px 0 !important; }
+  .section-header-pad, .vendor-header, .sticky-col { padding-left: 16px !important; padding-right: 16px !important; }
 }
