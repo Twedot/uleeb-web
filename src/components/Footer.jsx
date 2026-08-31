@@ -13,12 +13,7 @@ const LINKS = [
 function Logo() {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 16 }}>
-      <div style={{
-        width: 30, height: 30, borderRadius: 9, background: 'var(--ink)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-      }}>
-        <span className="display" style={{ fontWeight: 700, fontSize: 14, color: '#fff' }}>U</span>
-      </div>
+      <img src="/logo.png" alt="uleeb" width={30} height={30} style={{ borderRadius: 9, flexShrink: 0 }} />
       <span className="display" style={{ fontWeight: 700, fontSize: 18, color: 'var(--text)' }}>uleeb</span>
     </div>
   );

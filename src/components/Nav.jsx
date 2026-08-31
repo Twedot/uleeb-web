@@ -14,12 +14,7 @@ const MenuIcon = () => (
 function Logo() {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-      <div style={{
-        width: 34, height: 34, borderRadius: 10, background: 'var(--ink)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-      }}>
-        <span className="display" style={{ fontWeight: 700, fontSize: 16, color: '#fff' }}>U</span>
-      </div>
+      <img src="/logo.png" alt="uleeb" width={34} height={34} style={{ borderRadius: 10, flexShrink: 0 }} />
       <span className="display" style={{ fontWeight: 700, fontSize: 19, color: 'var(--text)' }}>uleeb</span>
     </div>
   );
