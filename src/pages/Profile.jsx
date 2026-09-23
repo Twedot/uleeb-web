@@ -103,7 +103,7 @@ function MenuRow({ label, sub, onClick }) {
 }
 
 const styles = {
-  screen: { display: 'flex', flexDirection: 'column', gap: 20, padding: '16px 24px 24px', overflowY: 'auto', height: '100%' },
+  screen: { display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 640, margin: '0 auto', padding: '32px 24px 48px' },
   header: { display: 'flex', alignItems: 'center', gap: 14, background: 'none', border: 'none', cursor: 'pointer', padding: 0 },
   avatar: {
     width: 56, height: 56, borderRadius: 999, background: '#131110',

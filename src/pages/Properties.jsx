@@ -22,10 +22,15 @@ export default function Properties() {
   return (
     <div style={styles.screen}>
       <div style={styles.header}>
-        <h1 style={styles.title}>Your properties</h1>
-        <p style={styles.subtitle}>
-          {properties.length} listed{limit !== undefined ? ` · ${user?.plan} plan (max ${limit})` : ''}
-        </p>
+        <div>
+          <h1 style={styles.title}>Your properties</h1>
+          <p style={styles.subtitle}>
+            {properties.length} listed{limit !== undefined ? ` · ${user?.plan} plan (max ${limit})` : ''}
+          </p>
+        </div>
+        <button type="button" style={styles.addBtn} onClick={handleAddProperty}>
+          Add property
+        </button>
       </div>
 
       {properties.length === 0 ? (
@@ -34,18 +39,12 @@ export default function Properties() {
           <p style={styles.emptySub}>List your first property to start receiving requests.</p>
         </div>
       ) : (
-        <div style={styles.list}>
+        <div style={styles.grid}>
           {properties.map((item) => (
             <PropertyRow key={item.id} item={item} onClick={() => navigate(`/my-properties/${item.id}`)} />
           ))}
         </div>
       )}
-
-      <div style={styles.footer}>
-        <button type="button" style={styles.addBtn} onClick={handleAddProperty}>
-          Add property
-        </button>
-      </div>
     </div>
   );
 }
@@ -82,14 +81,14 @@ function PropertyRow({ item, onClick }) {
 }
 
 const styles = {
-  screen: { display: 'flex', flexDirection: 'column', height: '100%' },
-  header: { padding: '16px 24px 0' },
-  title: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 26, color: '#181614' },
+  screen: { maxWidth: 1120, margin: '0 auto', padding: '32px 24px 48px' },
+  header: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap', marginBottom: 28 },
+  title: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 28, color: '#181614' },
   subtitle: { fontSize: 13, color: '#5B5750', marginTop: 4 },
-  empty: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 32px', textAlign: 'center' },
+  empty: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 32px', textAlign: 'center' },
   emptyTitle: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 18, color: '#181614', marginBottom: 8 },
   emptySub: { fontSize: 13.5, color: '#5B5750', lineHeight: '20px' },
-  list: { flex: 1, overflowY: 'auto', padding: 20, display: 'flex', flexDirection: 'column', gap: 12 },
+  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 },
   row: {
     background: '#FFFFFF', border: '1px solid #EFEDE6', borderRadius: 20, padding: 14,
     display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', width: '100%',
@@ -106,9 +105,8 @@ const styles = {
   name: { fontWeight: 700, fontSize: 14.5, color: '#181614', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
   meta: { fontSize: 12, color: '#9B968C', marginTop: 2 },
   statusBadge: { display: 'inline-block', borderRadius: 999, padding: '3px 8px', marginTop: 6, fontSize: 11, fontWeight: 600 },
-  footer: { padding: '8px 24px 16px' },
   addBtn: {
-    width: '100%', height: 54, borderRadius: 999, background: '#131110', color: '#FFFFFF',
-    fontSize: 15, fontWeight: 600, border: 'none', cursor: 'pointer',
+    flexShrink: 0, height: 44, padding: '0 22px', borderRadius: 999, background: '#131110', color: '#FFFFFF',
+    fontSize: 14, fontWeight: 600, border: 'none', cursor: 'pointer',
   },
 };

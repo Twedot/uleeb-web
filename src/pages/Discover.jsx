@@ -76,7 +76,7 @@ export default function Discover() {
       </div>
       <p style={styles.subtitle}>{subtitle}</p>
 
-      <div style={styles.deckArea}>
+      <div style={styles.deckAreaOuter}><div style={styles.deckArea}>
         <SwipeDeck
           ref={deckRef}
           data={deck}
@@ -93,7 +93,7 @@ export default function Discover() {
             </div>
           )}
         />
-      </div>
+      </div></div>
 
       <div style={styles.actions}>
         <button type="button" style={{ ...styles.actionBtn, ...styles.actionBig, ...styles.actionReject }} onClick={() => deckRef.current?.swipe('left')}>
@@ -110,21 +110,30 @@ export default function Discover() {
   );
 }
 
+// A swipe card only ever makes sense at a readable, phone-photo-ish width
+// even on a huge monitor — real web apps with this pattern (dating-site
+// desktop clients, etc.) center a fixed-width card in an open page rather
+// than stretching it edge-to-edge. That's a deliberate width on the CARD
+// COLUMN, not the whole page pretending to be a phone: the page itself,
+// nav, and background are full width (see AppShell.jsx).
+const CARD_COLUMN_WIDTH = 400;
+
 const styles = {
-  screen: { display: 'flex', flexDirection: 'column', height: '100%' },
-  header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px 0' },
-  title: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 22, color: '#181614' },
+  screen: { display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 24px 48px', minHeight: 'calc(100dvh - 64px)' },
+  header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', maxWidth: CARD_COLUMN_WIDTH },
+  title: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 26, color: '#181614' },
   headerIcons: { display: 'flex', gap: 10 },
   iconBtn: {
     width: 38, height: 38, borderRadius: 999, border: '1.5px solid #E6E3DB', background: '#FFFFFF',
     display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
   },
-  subtitle: { fontSize: 13, color: '#5B5750', padding: '4px 24px 16px' },
-  deckArea: { flex: 1, minHeight: 0, padding: '0 20px' },
+  subtitle: { fontSize: 13, color: '#5B5750', width: '100%', maxWidth: CARD_COLUMN_WIDTH, marginTop: 4, marginBottom: 20 },
+  deckAreaOuter: { width: '100%', maxWidth: CARD_COLUMN_WIDTH, flex: 1, display: 'flex' },
+  deckArea: { position: 'relative', flex: 1, minHeight: 520 },
   emptyState: { height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 24px', textAlign: 'center' },
   emptyTitle: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, color: '#181614', marginBottom: 8 },
   emptySub: { fontSize: 14, color: '#5B5750' },
-  actions: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 22, padding: '24px 0' },
+  actions: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 22, paddingTop: 24 },
   actionBtn: {
     borderRadius: 999, border: '1.5px solid #E6E3DB', background: '#FFFFFF',
     display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',

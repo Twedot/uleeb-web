@@ -147,3 +147,15 @@ img { max-width: 100%; display: block; }
   .footer-wrap { padding: 48px 16px 0 !important; }
   .section-header-pad, .vendor-header, .sticky-col { padding-left: 16px !important; padding-right: 16px !important; }
 }
+
+/* ── App shell (Discover/Properties/Profile/PropertyDetail) ─────────────
+   The authenticated area's own responsive behavior — a real web layout
+   (top nav, no fixed phone-width box), just collapsing PropertyDetail's
+   desktop two-column layout to a single stacked column on narrow
+   viewports, same breakpoint the marketing page already uses. */
+@media (max-width: 720px) {
+  .app-nav-label { display: none !important; }
+  .app-nav-link { padding: 10px !important; }
+  .uleeb-detail-layout { grid-template-columns: 1fr !important; gap: 24px !important; }
+  .uleeb-detail-photo-col { position: static !important; }
+}
