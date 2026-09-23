@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useInView } from '../hooks/useInView';
 import PhoneMockup from './PhoneMockup';
 
@@ -20,18 +21,17 @@ export default function CTASection() {
             Live now
           </div>
           <h2 className="display" style={{ fontSize: 'clamp(30px, 4.5vw, 52px)', fontWeight: 700, lineHeight: 1.1, color: '#fff', marginBottom: 18 }}>
-            uleeb is live — get it today.
+            uleeb is live — try it today.
           </h2>
           <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, marginBottom: 32, maxWidth: 420 }}>
-            Verified rentals, real landlords, no middleman. Download uleeb and
-            start swiping through homes near you.
+            Verified rentals, real landlords, no middleman. Sign up with your
+            phone number and start browsing homes near you — right in your
+            browser, no app download needed yet.
           </p>
 
-          {/* TODO: point at the real App Store / Play Store listing once
-              uleeb is actually submitted — placeholder until then. */}
-          <a href="#" className="btn-hero-white" style={{ display: 'inline-flex', textDecoration: 'none', padding: '16px 36px', borderRadius: 999 }}>
-            Get the app
-          </a>
+          <Link to="/login" className="btn-hero-white" style={{ display: 'inline-flex', textDecoration: 'none', padding: '16px 36px', borderRadius: 999 }}>
+            Get started
+          </Link>
         </div>
       </div>
 

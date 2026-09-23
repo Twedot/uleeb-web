@@ -2,7 +2,7 @@ const LINKS = [
   { title: 'Product', items: [
     { label: 'How it works', href: '#how-it-works' },
     { label: 'Listings', href: '#features' },
-    { label: 'Get the app', href: '#cta' },
+    { label: 'Get started', href: '/login' },
   ]},
   { title: 'Company', items: [
     { label: 'Powered by Twedot', href: 'https://twedot.com', external: true },

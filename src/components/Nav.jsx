@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { Link } from 'react-router-dom';
 
 const NAV_LINKS = [
   { label: 'How it works', href: '#how-it-works' },
@@ -71,7 +72,8 @@ export default function Nav() {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <a href="#cta" className="btn-primary" style={{ textDecoration: 'none' }}>Get the app</a>
+        <Link to="/login" className="nav-link nav-links" style={{ textDecoration: 'none' }}>Log in</Link>
+        <Link to="/login" className="btn-primary" style={{ textDecoration: 'none' }}>Sign up</Link>
 
         <div ref={menuRef} style={{ position: 'relative' }} className="nav-links">
           <button

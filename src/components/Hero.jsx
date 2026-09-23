@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useInView } from '../hooks/useInView';
 
 // A small stylized swipe-card stack (CSS only, no real screenshots yet) —
@@ -54,8 +55,8 @@ export default function Hero() {
               ever going through a middleman.
             </p>
             <div className={`hero-cta reveal delay-3 ${inView ? 'visible' : ''}`} style={{ display: 'flex', gap: 14 }}>
-              <a href="#cta" className="btn-hero-black">Get the app</a>
-              <a href="#landlords" className="btn-hero-outline">List a property</a>
+              <Link to="/login" className="btn-hero-black">Get started</Link>
+              <Link to="/login" className="btn-hero-outline">List a property</Link>
             </div>
           </div>
 
