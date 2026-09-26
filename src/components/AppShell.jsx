@@ -1,5 +1,7 @@
 import { NavLink, Outlet, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useRequests } from '../context/RequestsContext';
+import { useSentRequests } from '../context/SentRequestsContext';
 import { CompassIcon, HomeIcon, InboxIcon, PersonIcon } from './icons';
 
 // Real web layout for the authenticated app — a fixed TOP nav bar (same
@@ -22,6 +24,18 @@ export default function AppShell() {
   const firstName = user?.name?.split(' ')[0] ?? 'You';
   const initials = firstName.charAt(0).toUpperCase();
 
+  // A badge on the Requests tab for whatever needs this account's
+  // attention: a landlord hasn't reviewed yet ('new' applicants), a
+  // tenant has something outstanding worth checking — a request still
+  // pending a decision OR one that just got accepted (declined ones are
+  // resolved, nothing to draw the eye to). Both contexts already poll
+  // every 8s, so this stays live without any extra fetching of its own.
+  const { requests } = useRequests();
+  const { sentRequests } = useSentRequests();
+  const requestsBadge = role === 'landlord'
+    ? requests.filter((r) => r.status === 'new').length
+    : sentRequests.filter((r) => r.status === 'new' || r.status === 'accepted').length;
+
   return (
     <div style={styles.page}>
       <nav style={styles.nav}>
@@ -36,7 +50,12 @@ export default function AppShell() {
               <NavLink key={to} to={to} className="app-nav-link" style={({ isActive }) => ({ ...styles.link, ...(isActive ? styles.linkActive : null) })}>
                 {({ isActive }) => (
                   <>
-                    <Icon size={17} color={isActive ? '#131110' : '#5B5750'} strokeWidth={to === '/discover' ? 2 : 1.8} />
+                    <span style={{ position: 'relative', display: 'flex' }}>
+                      <Icon size={17} color={isActive ? '#131110' : '#5B5750'} strokeWidth={to === '/discover' ? 2 : 1.8} />
+                      {to === '/requests' && requestsBadge > 0 && (
+                        <span style={styles.badge}>{requestsBadge > 9 ? '9+' : requestsBadge}</span>
+                      )}
+                    </span>
                     <span className="app-nav-label">{label}</span>
                   </>
                 )}
@@ -75,6 +94,10 @@ const styles = {
     fontSize: 14, fontWeight: 600, padding: '8px 14px', borderRadius: 999,
   },
   linkActive: { color: '#131110', background: '#FFFFFF' },
+  badge: {
+    position: 'absolute', top: -6, right: -8, minWidth: 15, height: 15, padding: '0 3px', borderRadius: 999,
+    background: '#C8402A', color: '#FFFFFF', fontSize: 9.5, fontWeight: 700, lineHeight: '15px', textAlign: 'center',
+  },
   avatar: {
     width: 34, height: 34, borderRadius: 999, background: '#131110', flexShrink: 0,
     display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none',

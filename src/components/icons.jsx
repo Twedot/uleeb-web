@@ -129,3 +129,30 @@ export function PlayIcon({ size = 14, color = '#FFFFFF' }) {
     </svg>
   );
 }
+
+export function UploadIcon({ size = 18, color = '#181614', strokeWidth = 1.8 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <path d="M12 16V4M8 8l4-4 4 4" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function FileIcon({ size = 18, color = '#181614', strokeWidth = 1.8 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <path d="M6 3h8l4 4v14H6V3z" stroke={color} strokeWidth={strokeWidth} strokeLinejoin="round" />
+      <path d="M14 3v4h4" stroke={color} strokeWidth={strokeWidth} strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function CalendarIcon({ size = 15, color = '#181614', strokeWidth = 1.6 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <path d="M4 9h16M8 3v4M16 3v4" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+      <path d="M4 5h16v15H4z" stroke={color} strokeWidth={strokeWidth} strokeLinejoin="round" />
+    </svg>
+  );
+}

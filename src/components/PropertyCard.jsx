@@ -2,15 +2,18 @@ import { useNavigate } from 'react-router-dom';
 import { BookmarkIcon, CheckIcon, ChevronRightIcon, HomeIcon, PinIcon } from './icons';
 
 // Web counterpart to uleeb mobile's components/PropertyCard.tsx — same
-// layout/badges (deliberately no real photo either, matching mobile's own
-// placeholder-only card exactly).
+// layout/badges. Mobile shows the real first photo when one's been
+// uploaded, falling back to the placeholder icon only when photos is
+// empty (see data/mock.ts's Property type comment there) — this was
+// showing the placeholder unconditionally regardless of real photos.
 export function PropertyCard({ item, bookmarked }) {
   const navigate = useNavigate();
+  const cover = item.photos?.[0];
 
   return (
     <div style={styles.card}>
       <div style={styles.photo}>
-        <HomeIcon size={40} color="#D8D5CC" />
+        {cover ? <img src={cover} alt="" style={styles.photoImg} /> : <HomeIcon size={40} color="#D8D5CC" />}
         <div style={styles.dots}>
           {Array.from({ length: Math.min(item.photos?.length ?? 0, 6) }).map((_, i) => (
             <div key={i} style={{ ...styles.dot, ...(i === 0 ? styles.dotActive : null) }} />
@@ -78,7 +81,8 @@ const styles = {
     background: '#FFFFFF', borderRadius: 28, border: '1px solid #EFEDE6', overflow: 'hidden',
     boxShadow: '0 2px 8px rgba(0,0,0,0.06)', userSelect: 'none',
   },
-  photo: { position: 'relative', flex: '1.35', background: '#F0EFE9', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  photo: { position: 'relative', flex: '1.35', background: '#F0EFE9', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  photoImg: { width: '100%', height: '100%', objectFit: 'cover' },
   dots: { position: 'absolute', top: 14, left: 16, right: 16, display: 'flex', gap: 4 },
   dot: { flex: 1, height: 3, borderRadius: 999, background: 'rgba(255,255,255,0.35)' },
   dotActive: { background: '#FFFFFF' },

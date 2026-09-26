@@ -16,6 +16,15 @@ import Properties from './pages/Properties';
 import Requests from './pages/Requests';
 import Profile from './pages/Profile';
 import PropertyDetail from './pages/PropertyDetail';
+import MyPropertyDetail from './pages/MyPropertyDetail';
+import AddProperty from './pages/AddProperty';
+import EditProperty from './pages/EditProperty';
+import Plans from './pages/Plans';
+import Trust from './pages/Trust';
+import EditProfile from './pages/EditProfile';
+import SavedHomes from './pages/SavedHomes';
+import RequestDetail from './pages/RequestDetail';
+import Chat from './pages/Chat';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppShell from './components/AppShell';
 
@@ -72,6 +81,78 @@ export default function App() {
         element={
           <ProtectedRoute>
             <PropertyDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/my-properties/:id"
+        element={
+          <ProtectedRoute>
+            <MyPropertyDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/add-property"
+        element={
+          <ProtectedRoute>
+            <AddProperty />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/my-properties/:id/edit"
+        element={
+          <ProtectedRoute>
+            <EditProperty />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/plans"
+        element={
+          <ProtectedRoute>
+            <Plans />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/trust"
+        element={
+          <ProtectedRoute>
+            <Trust />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/edit-profile"
+        element={
+          <ProtectedRoute>
+            <EditProfile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/saved-homes"
+        element={
+          <ProtectedRoute>
+            <SavedHomes />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/requests/:id"
+        element={
+          <ProtectedRoute>
+            <RequestDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/chat/:id"
+        element={
+          <ProtectedRoute>
+            <Chat />
           </ProtectedRoute>
         }
       />

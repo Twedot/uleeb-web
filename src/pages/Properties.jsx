@@ -3,10 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useProperties } from '../context/PropertiesContext';
 import { HomeIcon, PlayIcon } from '../components/icons';
 
-// Web counterpart to uleeb mobile's app/(tabs)/properties.tsx. "Add
-// property" is a placeholder here — mobile's version uploads photos/
-// video/document via multipart form data, a real file-upload build of its
-// own that isn't in this pass.
+// Web counterpart to uleeb mobile's app/(tabs)/properties.tsx.
 const LISTING_LIMITS = { free: 1, pro: 5 };
 
 export default function Properties() {
@@ -16,7 +13,13 @@ export default function Properties() {
   const limit = user?.plan ? LISTING_LIMITS[user.plan] : undefined;
 
   function handleAddProperty() {
-    window.alert("Listing a property from the web is coming soon — for now, add properties from the Uleeb app.");
+    if (limit !== undefined && properties.length >= limit) {
+      if (window.confirm(`Your ${user.plan} plan is limited to ${limit} propert${limit === 1 ? 'y' : 'ies'}. View plans to add more?`)) {
+        navigate('/plans');
+      }
+      return;
+    }
+    navigate('/add-property');
   }
 
   return (

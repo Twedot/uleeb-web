@@ -43,6 +43,14 @@ export const SwipeDeck = forwardRef(function SwipeDeck({ data, renderCard, onSwi
 
   function handlePointerDown(e) {
     if (exiting) return;
+    // setPointerCapture below redirects every subsequent pointer event
+    // (and the click that follows) to this wrapper regardless of what's
+    // visually under the cursor — so a tap on the "Details" button (or
+    // any other control rendered inside the card) never reached it,
+    // since capture had already claimed the interaction. Bailing out of
+    // drag-start for clicks that begin on an interactive element lets
+    // those work normally; anywhere else on the card still drags.
+    if (e.target.closest('button, a')) return;
     startRef.current = { x: e.clientX, y: e.clientY };
     setDrag({ x: 0, y: 0, dragging: true });
     e.currentTarget.setPointerCapture(e.pointerId);

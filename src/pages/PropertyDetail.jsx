@@ -1,29 +1,30 @@
-import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useListings } from '../context/ListingsContext';
-import { useSwipes } from '../context/SwipesContext';
 import { useBookmarks } from '../context/BookmarksContext';
+import { useSentRequests } from '../context/SentRequestsContext';
 import { useAuth } from '../context/AuthContext';
-import { CheckIcon, ChevronLeftIcon, HomeIcon, PinIcon } from '../components/icons';
-import { ApiError } from '../lib/api';
+import { CheckIcon, ChevronLeftIcon, PinIcon } from '../components/icons';
+import { PhotoCarousel } from '../components/PhotoCarousel';
 
-// Web counterpart to uleeb mobile's app/property/[id].tsx. The status
-// banner ("your request is with the owner" / accepted / declined) needs
-// the sentRequests store, which is part of the Requests/Chat build this
-// pass doesn't include — "Request to view" here just records the same
-// right-swipe the Discover deck does.
+// Web counterpart to uleeb mobile's app/property/[id].tsx, including the
+// status banner ("your request is with the owner" / accepted / declined)
+// backed by SentRequestsContext, and the "Message owner" link into chat
+// once accepted.
 export default function PropertyDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { listings } = useListings();
-  const { recordSwipe } = useSwipes();
   const { isBookmarked, toggleBookmark } = useBookmarks();
+  const { sentRequests, sendRequest, getStatusFor } = useSentRequests();
   const { user } = useAuth();
-  const [photoIndex, setPhotoIndex] = useState(0);
-  const [requested, setRequested] = useState(false);
   const isPro = user?.plan === 'plus' || user?.plan === 'pro';
 
-  const item = listings.find((p) => p.id === id);
+  // Falls back to the embedded property on a matching sent request when
+  // it's missing from the discovery feed — guaranteed for anything
+  // already requested, since ListingsContext's feed excludes those (see
+  // uleeb-api's PropertyIDsForTenant). Covers navigating here from the
+  // Requests tab or a "Message owner" link, not just fresh browsing.
+  const item = listings.find((p) => p.id === id) ?? sentRequests.find((r) => r.propertyId === id)?.property;
   if (!item) {
     return (
       <div style={styles.notFound}>
@@ -34,19 +35,11 @@ export default function PropertyDetail() {
   }
 
   const photos = item.photos ?? [];
-  const hasReal = photos.length > 0;
+  const status = getStatusFor(item.id);
+  const requestId = sentRequests.find((r) => r.propertyId === item.id)?.id;
 
   async function handleRequest() {
-    try {
-      await recordSwipe(item.id, 'right');
-      setRequested(true);
-    } catch (err) {
-      if (err instanceof ApiError && err.status === 402) {
-        if (window.confirm(`You've hit your swipe limit. ${err.message} — view plans?`)) navigate('/plans');
-      } else {
-        window.alert('Could not send that request — please try again.');
-      }
-    }
+    await sendRequest(item.id);
   }
 
   async function handleBookmark() {
@@ -72,35 +65,22 @@ export default function PropertyDetail() {
             listing page (Airbnb/Zillow-style two-column detail), not a
             stacked mobile scroll. */}
         <div className="uleeb-detail-photo-col" style={styles.photoCol}>
-          <div style={styles.photoArea}>
-            {hasReal ? (
-              <img src={photos[photoIndex]} alt="" style={styles.mainImage} />
-            ) : (
-              <HomeIcon size={44} color="#D8D5CC" />
-            )}
-            {photos.length > 1 && (
+          <PhotoCarousel
+            photos={photos}
+            badge={
               <>
-                <button type="button" style={styles.tapLeft} onClick={() => setPhotoIndex((i) => Math.max(0, i - 1))} aria-label="Previous photo" />
-                <button type="button" style={styles.tapRight} onClick={() => setPhotoIndex((i) => Math.min(photos.length - 1, i + 1))} aria-label="Next photo" />
+                {item.verificationStatus === 'verified' && (
+                  <div style={{ ...styles.chip, ...styles.verifiedBadge, background: '#E3F5EA', color: '#2F8F55' }}>
+                    <CheckIcon size={11} color="#2F8F55" /> Verified
+                  </div>
+                )}
+                {item.verificationStatus === 'under_review' && (
+                  <div style={{ ...styles.chip, ...styles.verifiedBadge, background: '#FBF1DA', color: '#B8860B' }}>Under review</div>
+                )}
+                <div style={{ ...styles.chip, ...styles.matchBadge, background: '#131110', color: '#FFFFFF' }}>{item.matchScore}% match</div>
               </>
-            )}
-            {photos.length > 1 && (
-              <div style={styles.dots}>
-                {photos.map((_, i) => (
-                  <div key={i} style={{ ...styles.dot, ...(i === photoIndex ? styles.dotActive : null) }} />
-                ))}
-              </div>
-            )}
-            {item.verificationStatus === 'verified' && (
-              <div style={{ ...styles.chip, ...styles.verifiedBadge, background: '#E3F5EA', color: '#2F8F55' }}>
-                <CheckIcon size={11} color="#2F8F55" /> Verified
-              </div>
-            )}
-            {item.verificationStatus === 'under_review' && (
-              <div style={{ ...styles.chip, ...styles.verifiedBadge, background: '#FBF1DA', color: '#B8860B' }}>Under review</div>
-            )}
-            <div style={{ ...styles.chip, ...styles.matchBadge, background: '#131110', color: '#FFFFFF' }}>{item.matchScore}% match</div>
-          </div>
+            }
+          />
 
           {item.videoUrl && (
             <>
@@ -135,9 +115,24 @@ export default function PropertyDetail() {
               <button type="button" style={styles.saveBtn} onClick={handleBookmark}>
                 {isBookmarked(item.id) ? 'Saved' : 'Save'}
               </button>
-              <button type="button" style={styles.requestBtn} onClick={handleRequest} disabled={requested}>
-                {requested ? 'Request sent' : 'Request to view'}
+              <button type="button" style={styles.requestBtn} onClick={handleRequest} disabled={!!status}>
+                {status ? 'Request sent' : 'Request to view'}
               </button>
+            </div>
+          )}
+
+          {status && (
+            <div style={styles.statusBanner}>
+              <p style={styles.statusText}>
+                {status === 'new' && "Your request is with the owner — you'll be notified when they respond."}
+                {status === 'accepted' && 'Request accepted — message the owner to arrange next steps.'}
+                {status === 'declined' && 'The owner declined this request.'}
+              </p>
+              {status === 'accepted' && requestId && (
+                <button type="button" style={styles.messageOwnerBtn} onClick={() => navigate(`/chat/${requestId}`)}>
+                  Message owner
+                </button>
+              )}
             </div>
           )}
 
@@ -166,16 +161,6 @@ const styles = {
   },
   layout: { display: 'grid', gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 1fr)', gap: 40 },
   photoCol: { position: 'sticky', top: 88, alignSelf: 'start' },
-  photoArea: {
-    position: 'relative', background: '#F0EFE9', display: 'flex', alignItems: 'center', justifyContent: 'center',
-    height: 460, borderRadius: 24, overflow: 'hidden',
-  },
-  mainImage: { width: '100%', height: '100%', objectFit: 'cover' },
-  tapLeft: { position: 'absolute', left: 0, top: 0, bottom: 0, width: '35%', background: 'none', border: 'none', cursor: 'pointer' },
-  tapRight: { position: 'absolute', right: 0, top: 0, bottom: 0, width: '35%', background: 'none', border: 'none', cursor: 'pointer' },
-  dots: { position: 'absolute', bottom: 14, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 4 },
-  dot: { width: 6, height: 6, borderRadius: 999, background: 'rgba(255,255,255,0.5)' },
-  dotActive: { background: '#FFFFFF' },
   chip: { display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 600, padding: '6px 12px', borderRadius: 999, position: 'absolute' },
   verifiedBadge: { top: 16, right: 20 },
   matchBadge: { bottom: 14, left: 16 },
@@ -205,5 +190,11 @@ const styles = {
   requestBtn: {
     flex: 2, height: 50, borderRadius: 999, background: '#131110', border: 'none',
     fontSize: 14, fontWeight: 600, color: '#FFFFFF', cursor: 'pointer',
+  },
+  statusBanner: { background: '#F0EFE9', borderRadius: 16, padding: 14, marginBottom: 8, display: 'flex', flexDirection: 'column', gap: 10 },
+  statusText: { fontSize: 13, color: '#5B5750', lineHeight: '19px' },
+  messageOwnerBtn: {
+    height: 42, borderRadius: 999, background: '#131110', border: 'none', color: '#FFFFFF',
+    fontSize: 13.5, fontWeight: 600, cursor: 'pointer', alignSelf: 'flex-start', padding: '0 20px',
   },
 };

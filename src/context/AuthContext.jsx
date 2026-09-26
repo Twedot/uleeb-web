@@ -62,9 +62,15 @@ export function AuthProvider({ children }) {
           setUser(fromApiUser(me));
         }
       } catch (err) {
-        // Only a real "this token is no good" response should sign the
-        // device out — anything else (network blip) is transient.
-        if (err instanceof ApiError && err.status === 401) {
+        // A dead session — either the token itself is no good (401) or
+        // the account it points at is simply gone (404, e.g. deleted
+        // between visits) — should sign the device out so it can log in
+        // fresh. Anything else (network blip) is transient and shouldn't
+        // touch the stored token. Missing this 404 case meant a stale
+        // token from a since-removed account was NEVER cleared: every
+        // page load kept retrying the same dead token, got the same
+        // failure, and landed back on the login screen every time.
+        if (err instanceof ApiError && (err.status === 401 || err.status === 404)) {
           localStorage.removeItem(TOKEN_KEY);
         }
       } finally {
@@ -118,6 +124,27 @@ export function AuthProvider({ children }) {
     return authUser;
   }
 
+  // Web counterpart to mobile's payAndUpgrade — same two-call shape
+  // (initialize -> real Paystack checkout -> verify), but a full-page
+  // redirect instead of WebBrowser.openAuthSessionAsync (the standard way
+  // a web app hands off to a hosted checkout). Paystack redirects back to
+  // callbackUrl with a `reference` query param; verifyUpgrade below
+  // (called by pages/Plans.jsx on load) finishes the job.
+  async function initiateUpgrade(plan, months = 1) {
+    if (!token) throw new Error('Not signed in');
+    const callbackUrl = `${window.location.origin}/plans`;
+    const init = await api.post('/billing/paystack/initialize', { plan, months, callbackUrl }, token);
+    window.location.href = init.authorizationUrl;
+  }
+
+  async function verifyUpgrade(reference) {
+    if (!token) return null;
+    const updated = await api.post('/billing/paystack/verify', { reference }, token);
+    const authUser = fromApiUser(updated);
+    setUser(authUser);
+    return authUser;
+  }
+
   async function updateProfile(fields) {
     if (!token) return;
     const payload = { ...fields };
@@ -146,6 +173,8 @@ export function AuthProvider({ children }) {
         cancelPhoneVerification,
         setRole,
         updateProfile,
+        initiateUpgrade,
+        verifyUpgrade,
         signOut,
       }}
     >
