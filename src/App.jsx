@@ -30,6 +30,7 @@ import Filters from './pages/Filters';
 import Notifications from './pages/Notifications';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppShell from './components/AppShell';
+import NotFound from './pages/NotFound';
 
 function Landing() {
   return (
@@ -174,6 +175,7 @@ export default function App() {
         <Route path="/filters" element={<Filters />} />
         <Route path="/notifications" element={<Notifications />} />
       </Route>
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }
