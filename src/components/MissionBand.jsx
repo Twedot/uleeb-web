@@ -8,7 +8,7 @@ export default function MissionBand() {
 
   return (
     <section style={{
-      background: 'linear-gradient(160deg, #232019 0%, #131110 100%)',
+      background: 'linear-gradient(160deg, #1E293B 0%, #0F172A 100%)',
       padding: 'clamp(80px, 11vw, 140px) 24px',
       textAlign: 'center',
     }}>

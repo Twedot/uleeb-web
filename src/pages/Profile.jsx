@@ -54,7 +54,7 @@ export default function Profile() {
               {isLandlord ? 'Add how you list properties to get verified.' : 'Add your occupation, budget, and state to get verified.'}
             </p>
           </div>
-          <ChevronRightIcon size={14} color="#9B968C" />
+          <ChevronRightIcon size={14} color="#94A3B8" />
         </button>
       )}
 
@@ -97,7 +97,7 @@ function MenuRow({ label, sub, onClick }) {
         <p style={styles.menuLabel}>{label}</p>
         <p style={styles.menuSub}>{sub}</p>
       </div>
-      <ChevronRightIcon size={14} color="#9B968C" />
+      <ChevronRightIcon size={14} color="#94A3B8" />
     </button>
   );
 }
@@ -106,32 +106,33 @@ const styles = {
   screen: { display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 640, margin: '0 auto', padding: '32px 24px 48px' },
   header: { display: 'flex', alignItems: 'center', gap: 14, background: 'none', border: 'none', cursor: 'pointer', padding: 0 },
   avatar: {
-    width: 56, height: 56, borderRadius: 999, background: '#131110',
+    width: 56, height: 56, borderRadius: 999, background: '#2563EB',
     display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
   },
-  avatarText: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 22, color: '#FFFFFF' },
+  avatarText: { fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 22, color: '#FFFFFF' },
   nameRow: { display: 'flex', alignItems: 'center', gap: 6 },
-  name: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20, color: '#181614' },
+  name: { fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 20, color: '#0F172A' },
   verifiedBadge: {
     width: 18, height: 18, borderRadius: 999, background: '#2F8F55',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
   },
-  plan: { fontSize: 11, fontWeight: 600, letterSpacing: 0.6, color: '#9B968C', marginTop: 2 },
+  plan: { fontSize: 11, fontWeight: 600, letterSpacing: 0.6, color: '#94A3B8', marginTop: 2 },
   nudge: {
-    display: 'flex', alignItems: 'center', gap: 10, background: '#F0EFE9', border: '1px solid #EFEDE6',
+    display: 'flex', alignItems: 'center', gap: 10, background: '#EEF6FF', border: '1px solid #DBEAFE',
     borderRadius: 16, padding: 16, cursor: 'pointer',
   },
-  nudgeTitle: { fontSize: 13.5, fontWeight: 700, color: '#181614', marginBottom: 2 },
-  nudgeSub: { fontSize: 12, color: '#9B968C' },
-  leaseCard: { background: '#FFFFFF', border: '1px solid #EFEDE6', borderRadius: 28, padding: 16 },
-  leaseLabel: { fontSize: 11, fontWeight: 600, letterSpacing: 0.6, textTransform: 'uppercase', color: '#9B968C', marginBottom: 6 },
-  leaseTitle: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 17, color: '#181614', marginBottom: 4 },
-  leaseSub: { fontSize: 13, color: '#5B5750' },
+  nudgeTitle: { fontSize: 13.5, fontWeight: 700, color: '#0F172A', marginBottom: 2 },
+  nudgeSub: { fontSize: 12, color: '#94A3B8' },
+  leaseCard: { background: '#FFFFFF', border: '1px solid #DBEAFE', borderRadius: 28, padding: 16 },
+  leaseLabel: { fontSize: 11, fontWeight: 600, letterSpacing: 0.6, textTransform: 'uppercase', color: '#94A3B8', marginBottom: 6 },
+  leaseTitle: { fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 17, color: '#0F172A', marginBottom: 4 },
+  leaseSub: { fontSize: 13, color: '#475569' },
   menu: { display: 'flex', flexDirection: 'column', gap: 12 },
   menuRow: {
-    background: '#FFFFFF', border: '1px solid #EFEDE6', borderRadius: 16, padding: 16,
+    background: '#FFFFFF', border: '1px solid #DBEAFE', borderRadius: 16, padding: 16,
     display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', width: '100%',
+    boxShadow: '0 2px 8px rgba(59,130,246,0.06)',
   },
-  menuLabel: { fontSize: 14.5, fontWeight: 700, color: '#181614' },
-  menuSub: { fontSize: 12, color: '#9B968C', marginTop: 2 },
+  menuLabel: { fontSize: 14.5, fontWeight: 700, color: '#0F172A' },
+  menuSub: { fontSize: 12, color: '#94A3B8', marginTop: 2 },
 };

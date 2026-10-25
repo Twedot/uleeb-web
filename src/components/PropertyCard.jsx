@@ -40,7 +40,7 @@ export function PropertyCard({ item, bookmarked }) {
       <div style={styles.details}>
         <p style={styles.title}>{item.title}</p>
         <div style={styles.locationRow}>
-          <PinIcon size={12} color="#9B968C" />
+          <PinIcon size={12} color="#94A3B8" />
           <span style={styles.location}>
             {item.location}, {item.state}, {item.country}
           </span>
@@ -67,7 +67,7 @@ export function PropertyCard({ item, bookmarked }) {
             }}
             style={styles.detailsBtn}
           >
-            Details <ChevronRightIcon size={12} color="#5B5750" />
+            Details <ChevronRightIcon size={12} color="#2563EB" />
           </button>
         </div>
       </div>
@@ -78,39 +78,41 @@ export function PropertyCard({ item, bookmarked }) {
 const styles = {
   card: {
     display: 'flex', flexDirection: 'column', height: '100%',
-    background: '#FFFFFF', borderRadius: 28, border: '1px solid #EFEDE6', overflow: 'hidden',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.06)', userSelect: 'none',
+    background: '#FFFFFF', borderRadius: 28, border: '1px solid #DBEAFE', overflow: 'hidden',
+    boxShadow: '0 4px 20px rgba(59,130,246,0.10)', userSelect: 'none',
   },
-  photo: { position: 'relative', flex: '1.35', background: '#F0EFE9', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  photo: { position: 'relative', flex: '1.35', background: '#E3EFFD', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
   photoImg: { width: '100%', height: '100%', objectFit: 'cover' },
   dots: { position: 'absolute', top: 14, left: 16, right: 16, display: 'flex', gap: 4 },
-  dot: { flex: 1, height: 3, borderRadius: 999, background: 'rgba(255,255,255,0.35)' },
+  dot: { flex: 1, height: 3, borderRadius: 999, background: 'rgba(255,255,255,0.4)' },
   dotActive: { background: '#FFFFFF' },
   badgeLeft: {
-    position: 'absolute', top: 28, left: 16, background: '#131110', color: '#FFFFFF',
-    fontSize: 12, fontWeight: 600, padding: '6px 12px', borderRadius: 999,
+    position: 'absolute', top: 28, left: 16,
+    background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)', color: '#FFFFFF',
+    fontSize: 12, fontWeight: 700, padding: '6px 12px', borderRadius: 999,
+    boxShadow: '0 2px 8px rgba(37,99,235,0.3)',
   },
   badgeRightStack: { position: 'absolute', top: 28, right: 16, display: 'flex', alignItems: 'center', gap: 6 },
   chip: { display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 600, padding: '6px 12px', borderRadius: 999 },
   badgeVerified: { background: '#E3F5EA', color: '#2F8F55' },
   badgeUnderReview: { background: '#FBF1DA', color: '#B8860B' },
   bookmarkedBadge: {
-    width: 24, height: 24, borderRadius: 999, background: '#131110',
+    width: 24, height: 24, borderRadius: 999, background: '#2563EB',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
   },
   details: { padding: 20, display: 'flex', flexDirection: 'column', gap: 10 },
-  title: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 19, color: '#181614', lineHeight: '24px' },
+  title: { fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 19, color: '#0F172A', lineHeight: '24px' },
   locationRow: { display: 'flex', alignItems: 'center', gap: 4 },
-  location: { fontSize: 13, color: '#9B968C' },
+  location: { fontSize: 13, color: '#94A3B8' },
   factsRow: { display: 'flex', gap: 6 },
-  fact: { fontSize: 13, color: '#5B5750', fontWeight: 500 },
-  factDot: { fontSize: 13, color: '#9B968C' },
+  fact: { fontSize: 13, color: '#475569', fontWeight: 500 },
+  factDot: { fontSize: 13, color: '#94A3B8' },
   footerRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 2 },
   priceRow: { display: 'flex', alignItems: 'baseline' },
-  price: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 24, color: '#181614' },
-  priceUnit: { fontSize: 13, color: '#9B968C' },
+  price: { fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 24, color: '#0F172A' },
+  priceUnit: { fontSize: 13, color: '#94A3B8' },
   detailsBtn: {
-    display: 'flex', alignItems: 'center', gap: 3, fontSize: 12.5, fontWeight: 600, color: '#5B5750',
-    padding: '8px 12px', borderRadius: 999, background: '#F0EFE9', border: 'none', cursor: 'pointer',
+    display: 'flex', alignItems: 'center', gap: 3, fontSize: 12.5, fontWeight: 600, color: '#2563EB',
+    padding: '8px 12px', borderRadius: 999, background: '#DBEAFE', border: 'none', cursor: 'pointer',
   },
 };

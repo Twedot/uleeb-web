@@ -6,22 +6,23 @@
    card containers, footer layout), re-skinned in uleeb's own established
    product colors, the same way the pattern is meant to be reused. */
 :root {
-  --bg:           #F7F6F2;
-  --bg-alt:       #F0EFE9;
+  --bg:           #EEF6FF;
+  --bg-alt:       #E3EFFD;
   --bg-card:      #FFFFFF;
-  --text:         #181614;
-  --text-muted:   #5B5750;
-  --text-faint:   #9B968C;
+  --text:         #0F172A;
+  --text-muted:   #475569;
+  --text-faint:   #94A3B8;
   --text-inv:     #FFFFFF;
-  --border:       #E6E3DB;
-  --border-sub:   #EFEDE6;
-  --ink:          #131110;
+  --border:       #BFDBFE;
+  --border-sub:   #DBEAFE;
+  --ink:          #0F172A;
+  --blue:         #2563EB;
   --green:        #2F8F55;
   --green-bg:     #E3F5EA;
   --red:          #C8402A;
   --red-bg:       #FBE9E5;
-  --shadow:       0 4px 24px rgba(19,17,16,0.06);
-  --shadow-lg:    0 16px 48px rgba(19,17,16,0.12);
+  --shadow:       0 4px 24px rgba(59,130,246,0.08);
+  --shadow-lg:    0 16px 48px rgba(59,130,246,0.14);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,7 +30,7 @@ html { scroll-behavior: smooth; overflow-x: clip; }
 body {
   background-color: var(--bg);
   color: var(--text);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Poppins', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
 }
@@ -40,7 +41,7 @@ img { max-width: 100%; display: block; }
 [id] { scroll-margin-top: 84px; }
 
 .display {
-  font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  font-family: 'Poppins', system-ui, sans-serif;
   letter-spacing: -0.01em;
 }
 
@@ -76,15 +77,15 @@ img { max-width: 100%; display: block; }
 
 /* ── Buttons ──────────────────────────────────────────────────────────── */
 .btn-hero-black {
-  background: var(--ink); color: #fff;
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); color: #fff;
   border: none; border-radius: 999px;
   padding: 18px 44px; font-weight: 700; font-size: 17px;
   cursor: pointer; font-family: inherit;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 16px 48px rgba(15,23,42,0.22);
   transition: transform 0.2s, box-shadow 0.2s;
   display: inline-flex; align-items: center; gap: 10px;
 }
-.btn-hero-black:hover { transform: translateY(-2px); box-shadow: 0 20px 52px rgba(19,17,16,0.2); }
+.btn-hero-black:hover { transform: translateY(-2px); box-shadow: 0 20px 52px rgba(15,23,42,0.30); }
 
 .btn-hero-outline {
   background: #fff; color: var(--ink);
@@ -105,13 +106,13 @@ img { max-width: 100%; display: block; }
 .btn-hero-white:hover { opacity: 0.9; }
 
 .btn-primary {
-  background: var(--ink); color: #fff;
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); color: #fff;
   border: none; border-radius: 999px;
   padding: 14px 30px; font-weight: 700; font-size: 15px;
   cursor: pointer; font-family: inherit;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, transform 0.2s;
 }
-.btn-primary:hover { opacity: 0.85; }
+.btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
 
 /* ── Section pill ─────────────────────────────────────────────────────── */
 .section-pill {

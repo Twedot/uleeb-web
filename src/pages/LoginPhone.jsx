@@ -126,9 +126,11 @@ export default function LoginPhone() {
             onClick={handleSendCode}
             disabled={!phoneValid || isSigningIn}
             style={{
-              height: 54, borderRadius: 999, background: 'var(--ink)', color: '#fff', border: 'none',
+              height: 54, borderRadius: 999,
+              background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: '#fff', border: 'none',
               fontSize: 15, fontWeight: 600, cursor: (!phoneValid || isSigningIn) ? 'default' : 'pointer',
               opacity: (!phoneValid || isSigningIn) ? 0.4 : 1,
+              boxShadow: '0 4px 16px rgba(15,23,42,0.20)',
             }}
           >
             {isSigningIn ? 'Sending…' : 'Send code'}
@@ -138,9 +140,11 @@ export default function LoginPhone() {
             onClick={handleVerify}
             disabled={code.length < 4 || isSigningIn}
             style={{
-              height: 54, borderRadius: 999, background: 'var(--ink)', color: '#fff', border: 'none',
+              height: 54, borderRadius: 999,
+              background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: '#fff', border: 'none',
               fontSize: 15, fontWeight: 600, cursor: (code.length < 4 || isSigningIn) ? 'default' : 'pointer',
               opacity: (code.length < 4 || isSigningIn) ? 0.4 : 1,
+              boxShadow: '0 4px 16px rgba(15,23,42,0.20)',
             }}
           >
             {isSigningIn ? 'Verifying…' : 'Verify'}

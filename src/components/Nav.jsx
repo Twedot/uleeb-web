@@ -56,7 +56,7 @@ export default function Nav() {
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1100,
         height: 68,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        background: 'rgba(247,246,242,0.92)',
+        background: 'rgba(238,246,255,0.92)',
         backdropFilter: 'blur(10px)',
         borderBottom: '1px solid var(--border-sub)',
         transform: hidden ? 'translateY(-100%)' : 'translateY(0)',

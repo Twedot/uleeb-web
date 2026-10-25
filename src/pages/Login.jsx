@@ -25,10 +25,12 @@ export default function Login() {
         <button
           className="onb-option"
           style={{
-            height: 54, borderRadius: 999, background: 'var(--ink)', color: '#fff',
+            height: 54, borderRadius: 999,
+            background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: '#fff',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
             fontSize: 15, fontWeight: 600, border: 'none', cursor: isSigningIn ? 'default' : 'pointer',
             opacity: isSigningIn ? 0.7 : 1,
+            boxShadow: '0 4px 16px rgba(15,23,42,0.22)',
           }}
           disabled={isSigningIn}
           onClick={() => navigate('/login-phone')}

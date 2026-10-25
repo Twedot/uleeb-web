@@ -41,22 +41,23 @@
   width: 64px;
   height: 64px;
   border-radius: 24px;
-  background: var(--ink);
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 24px;
+  box-shadow: 0 8px 24px rgba(15,23,42,0.22);
 }
 
 .auth-mark span {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 26px;
   color: #fff;
   font-weight: 700;
 }
 
 .auth-title {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 26px;
   font-weight: 700;
   color: var(--text);
@@ -121,7 +122,8 @@
 }
 
 .auth-input:focus {
-  border-color: var(--ink);
+  border-color: #0F172A;
+  box-shadow: 0 0 0 3px rgba(15,23,42,0.08);
 }
 
 .auth-input::placeholder {
@@ -129,7 +131,7 @@
 }
 
 .auth-code-input {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 22px;
   letter-spacing: 6px;
   text-align: center;
@@ -263,7 +265,7 @@
 }
 
 .onb-progress-bar.active {
-  background: var(--ink);
+  background: linear-gradient(90deg, #1E293B, #0F172A);
 }
 
 .onb-preview {
@@ -296,7 +298,7 @@
 }
 
 .onb-avatar span {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 20px;
   color: #fff;
 }
@@ -325,7 +327,7 @@
 }
 
 .onb-q-title {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 28px;
   color: var(--text);
   line-height: 1.15;
@@ -359,8 +361,8 @@
 }
 
 .onb-option.active {
-  background: var(--ink);
-  border-color: var(--ink);
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+  border-color: #0F172A;
   color: #fff;
 }
 
@@ -384,13 +386,13 @@
 }
 
 .onb-budget-input span {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 26px;
   color: var(--text);
 }
 
 .onb-budget-input input {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 26px;
   color: var(--text);
   flex: 1;
@@ -419,8 +421,8 @@
 }
 
 .onb-toggle.active {
-  background: var(--ink);
-  border-color: var(--ink);
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+  border-color: #0F172A;
   color: #fff;
 }
 

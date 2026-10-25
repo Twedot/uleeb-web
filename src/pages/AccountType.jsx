@@ -73,28 +73,28 @@ export default function AccountType() {
               onClick={() => { setSelected(opt.role); setError(null); }}
               style={{
                 display: 'flex', alignItems: 'center', gap: 14, padding: 16, borderRadius: 24,
-                border: `1.5px solid ${active ? 'var(--ink)' : 'var(--border)'}`, background: '#fff',
+                border: `1.5px solid ${active ? '#0F172A' : 'var(--border)'}`, background: '#fff',
                 cursor: 'pointer', textAlign: 'left', width: '100%',
               }}
             >
               <div style={{
                 width: 44, height: 44, borderRadius: 999, flexShrink: 0,
-                background: active ? 'var(--ink)' : 'var(--bg-alt)',
+                background: active ? 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)' : 'var(--bg-alt)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 <Icon size={22} color={active ? '#fff' : 'var(--text)'} />
               </div>
               <div style={{ flex: 1 }}>
-                <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 17, color: 'var(--text)', marginBottom: 3, fontWeight: 700 }}>
+                <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: 17, color: 'var(--text)', marginBottom: 3, fontWeight: 700 }}>
                   {opt.title}
                 </p>
                 <p style={{ fontSize: 12.5, color: 'var(--text-faint)', lineHeight: 1.4 }}>{opt.sub}</p>
               </div>
               <div style={{
-                width: 22, height: 22, borderRadius: 999, border: `1.5px solid ${active ? 'var(--ink)' : 'var(--border)'}`,
+                width: 22, height: 22, borderRadius: 999, border: `1.5px solid ${active ? '#0F172A' : 'var(--border)'}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
               }}>
-                {active && <div style={{ width: 11, height: 11, borderRadius: 999, background: 'var(--ink)' }} />}
+                {active && <div style={{ width: 11, height: 11, borderRadius: 999, background: '#0F172A' }} />}
               </div>
             </button>
           );
@@ -107,7 +107,9 @@ export default function AccountType() {
           onClick={handleContinue}
           disabled={!selected || saving}
           style={{
-            height: 54, width: '100%', borderRadius: 999, border: 'none', background: 'var(--ink)', color: '#fff',
+            height: 54, width: '100%', borderRadius: 999, border: 'none',
+            background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: '#fff',
+            boxShadow: '0 4px 16px rgba(15,23,42,0.20)',
             fontSize: 15, fontWeight: 600, cursor: (!selected || saving) ? 'default' : 'pointer',
             opacity: (!selected || saving) ? 0.4 : 1,
           }}

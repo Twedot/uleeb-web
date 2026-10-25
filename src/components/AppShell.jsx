@@ -2,7 +2,8 @@ import { NavLink, Outlet, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useRequests } from '../context/RequestsContext';
 import { useSentRequests } from '../context/SentRequestsContext';
-import { CompassIcon, HomeIcon, InboxIcon, PersonIcon } from './icons';
+import { useNotifications } from '../context/NotificationsContext';
+import { BellIcon, CompassIcon, HomeIcon, InboxIcon, PersonIcon } from './icons';
 
 // Real web layout for the authenticated app — a fixed TOP nav bar (same
 // pattern as the marketing site's own Nav.jsx: logo left, links center,
@@ -32,6 +33,7 @@ export default function AppShell() {
   // every 8s, so this stays live without any extra fetching of its own.
   const { requests } = useRequests();
   const { sentRequests } = useSentRequests();
+  const { unreadCount: notifUnread } = useNotifications();
   const requestsBadge = role === 'landlord'
     ? requests.filter((r) => r.status === 'new').length
     : sentRequests.filter((r) => r.status === 'new' || r.status === 'accepted').length;
@@ -51,7 +53,7 @@ export default function AppShell() {
                 {({ isActive }) => (
                   <>
                     <span style={{ position: 'relative', display: 'flex' }}>
-                      <Icon size={17} color={isActive ? '#131110' : '#5B5750'} strokeWidth={to === '/discover' ? 2 : 1.8} />
+                      <Icon size={17} color={isActive ? '#2563EB' : '#475569'} strokeWidth={to === '/discover' ? 2 : 1.8} />
                       {to === '/requests' && requestsBadge > 0 && (
                         <span style={styles.badge}>{requestsBadge > 9 ? '9+' : requestsBadge}</span>
                       )}
@@ -63,9 +65,17 @@ export default function AppShell() {
             ))}
           </div>
 
-          <Link to="/profile" style={styles.avatar} aria-label="Profile">
-            <span style={styles.avatarText}>{initials}</span>
-          </Link>
+          <div style={styles.rightGroup}>
+            <Link to="/notifications" style={styles.bellBtn} aria-label="Notifications">
+              <BellIcon size={17} color="#475569" />
+              {notifUnread > 0 && (
+                <span style={styles.badge}>{notifUnread > 9 ? '9+' : notifUnread}</span>
+              )}
+            </Link>
+            <Link to="/profile" style={styles.avatar} aria-label="Profile">
+              <span style={styles.avatarText}>{initials}</span>
+            </Link>
+          </div>
         </div>
       </nav>
 
@@ -77,31 +87,37 @@ export default function AppShell() {
 }
 
 const styles = {
-  page: { minHeight: '100dvh', background: '#F7F6F2' },
+  page: { minHeight: '100dvh', background: '#EEF6FF' },
   nav: {
     position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1100, height: 64,
-    background: 'rgba(247,246,242,0.92)', backdropFilter: 'blur(10px)', borderBottom: '1px solid #EFEDE6',
+    background: 'rgba(238,246,255,0.92)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #DBEAFE',
   },
   navInner: {
     height: '100%', maxWidth: 1120, margin: '0 auto', padding: '0 24px',
     display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24,
   },
   logo: { display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', flexShrink: 0 },
-  logoText: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 17, color: '#181614' },
+  logoText: { fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 17, color: '#0F172A' },
   links: { display: 'flex', alignItems: 'center', gap: 4 },
   link: {
-    display: 'flex', alignItems: 'center', gap: 7, textDecoration: 'none', color: '#5B5750',
+    display: 'flex', alignItems: 'center', gap: 7, textDecoration: 'none', color: '#475569',
     fontSize: 14, fontWeight: 600, padding: '8px 14px', borderRadius: 999,
   },
-  linkActive: { color: '#131110', background: '#FFFFFF' },
+  linkActive: { color: '#2563EB', background: '#DBEAFE' },
   badge: {
     position: 'absolute', top: -6, right: -8, minWidth: 15, height: 15, padding: '0 3px', borderRadius: 999,
-    background: '#C8402A', color: '#FFFFFF', fontSize: 9.5, fontWeight: 700, lineHeight: '15px', textAlign: 'center',
+    background: '#2563EB', color: '#FFFFFF', fontSize: 9.5, fontWeight: 700, lineHeight: '15px', textAlign: 'center',
   },
-  avatar: {
-    width: 34, height: 34, borderRadius: 999, background: '#131110', flexShrink: 0,
+  rightGroup: { display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 },
+  bellBtn: {
+    position: 'relative', width: 34, height: 34, borderRadius: 999,
+    border: '1.5px solid #BFDBFE', background: '#FFFFFF', flexShrink: 0,
     display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none',
   },
-  avatarText: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 13, color: '#FFFFFF' },
-  content: { paddingTop: 64, minHeight: '100dvh' },
+  avatar: {
+    width: 34, height: 34, borderRadius: 999, background: '#2563EB', flexShrink: 0,
+    display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none',
+  },
+  avatarText: { fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 13, color: '#FFFFFF' },
+  content: { paddingTop: 64, minHeight: '100dvh', background: '#FFFFFF' },
 };

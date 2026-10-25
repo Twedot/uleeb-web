@@ -148,11 +148,45 @@ export function FileIcon({ size = 18, color = '#181614', strokeWidth = 1.8 }) {
   );
 }
 
+export function WhatsAppIcon({ size = 16, color = '#FFFFFF' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <path d="M12 2C6.477 2 2 6.477 2 12c0 1.9.524 3.677 1.438 5.195L2 22l4.938-1.418A9.953 9.953 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a7.96 7.96 0 0 1-4.073-1.115l-.292-.174-3.033.87.87-3.003-.19-.31A7.955 7.955 0 0 1 4 12c0-4.411 3.589-8 8-8s8 3.589 8 8-3.589 8-8 8zm4.39-5.845c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06a6.56 6.56 0 0 1-1.93-1.19 7.23 7.23 0 0 1-1.336-1.663c-.14-.24-.015-.37.105-.49.108-.108.24-.282.36-.423.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.196-.468-.394-.404-.54-.412l-.46-.008c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.692 2.582 4.1 3.62.573.247 1.02.394 1.368.504.575.183 1.098.157 1.512.095.461-.069 1.42-.581 1.62-1.142.2-.561.2-1.042.14-1.142-.06-.1-.22-.16-.46-.28z" />
+    </svg>
+  );
+}
+
 export function CalendarIcon({ size = 15, color = '#181614', strokeWidth = 1.6 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <path d="M4 9h16M8 3v4M16 3v4" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
       <path d="M4 5h16v15H4z" stroke={color} strokeWidth={strokeWidth} strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function SearchIcon({ size = 16, color = 'currentColor', strokeWidth = 2 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="7" />
+      <path d="M21 21l-4.35-4.35" />
+    </svg>
+  );
+}
+
+export function BellIcon({ size = 18, color = 'currentColor', strokeWidth = 1.8 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+    </svg>
+  );
+}
+
+export function ChevronDownIcon({ size = 16, color = 'currentColor', strokeWidth = 2 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="6 9 12 15 18 9" />
     </svg>
   );
 }

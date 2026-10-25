@@ -1,13 +1,16 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, postAuthRoute } from '../context/AuthContext';
 import { PhoneInput, isPhoneInputValid, phoneInputToE164 } from '../components/PhoneInput';
-import { ChevronLeftIcon } from '../components/icons';
+import { ChevronLeftIcon, PinIcon } from '../components/icons';
 import { Chip, Label } from '../components/ui';
+import { StateSelect } from '../components/StateSelect';
+import { LocationAutocomplete } from '../components/LocationAutocomplete';
+import { normalizeState } from '../lib/nigeria';
+import { detectLocation } from '../lib/geocode';
 import '../styles/auth.css';
 
 const OCCUPATIONS = ['Employed', 'Self-employed', 'Student', 'Remote worker'];
-const NIGERIAN_STATES = ['Lagos', 'Abuja (FCT)', 'Rivers', 'Oyo', 'Ogun', 'Kano', 'Enugu', 'Kaduna'];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Mirrors uleeb mobile's app/profile-setup.tsx — same step sequence
@@ -25,18 +28,40 @@ export default function ProfileSetup() {
   const [name, setName] = useState(user?.name && user.name !== 'You' ? user.name : '');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const [emailTaken, setEmailTaken] = useState(false);
+  const [emailChecking, setEmailChecking] = useState(false);
   const [occupation, setOccupation] = useState(null);
   const [budget, setBudget] = useState('2400000');
   const [period, setPeriod] = useState('year');
   const [state, setState] = useState(null);
+  const [locationAddress, setLocationAddress] = useState('');
+  const [detecting, setDetecting] = useState(false);
+  const [detectError, setDetectError] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+
+  async function handleDetectLocation() {
+    setDetecting(true);
+    setDetectError(null);
+    try {
+      const result = await detectLocation();
+      setLocationAddress(result.address);
+      if (result.rawState) {
+        const normalized = normalizeState(result.rawState);
+        if (normalized) setState(normalized);
+      }
+    } catch (e) {
+      setDetectError(e.message);
+    } finally {
+      setDetecting(false);
+    }
+  }
 
   const currentStep = STEPS[step];
   const canContinue =
     (currentStep === 'name' && name.trim().length > 1) ||
     (currentStep === 'phone' && isPhoneInputValid(phone)) ||
-    (currentStep === 'email' && EMAIL_RE.test(email.trim())) ||
+    (currentStep === 'email' && EMAIL_RE.test(email.trim()) && !emailTaken && !emailChecking) ||
     (currentStep === 'occupation' && !!occupation) ||
     (currentStep === 'budget' && budget.length > 0) ||
     (currentStep === 'state' && !!state);
@@ -46,6 +71,24 @@ export default function ProfileSetup() {
   const budgetLabel = budget ? `₦${Number(budget).toLocaleString()}` : 'Budget —';
 
   async function next() {
+    if (!canContinue) return;
+
+    if (currentStep === 'email' && !user?.email) {
+      setEmailChecking(true);
+      try {
+        const res = await fetch(`https://uleebapi.twedot.com/auth/check-email?email=${encodeURIComponent(email.trim())}`);
+        const data = await res.json().catch(() => ({}));
+        if (data.available === false) {
+          setEmailTaken(true);
+          return;
+        }
+      } catch {
+        // network issue — allow proceeding, backend will catch it on submit
+      } finally {
+        setEmailChecking(false);
+      }
+    }
+
     if (step < STEPS.length - 1) {
       setStep(step + 1);
       return;
@@ -64,7 +107,16 @@ export default function ProfileSetup() {
       });
       navigate(postAuthRoute(user), { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Please try again.');
+      const msg = err instanceof Error ? err.message : 'Please try again.';
+      if (msg.toLowerCase().includes('email')) {
+        const emailStep = STEPS.indexOf('email');
+        if (emailStep !== -1) {
+          setStep(emailStep);
+          setEmailTaken(true);
+        }
+      } else {
+        setError(msg);
+      }
     } finally {
       setSaving(false);
     }
@@ -128,7 +180,9 @@ export default function ProfileSetup() {
           <>
             <h2 className="onb-q-title">What's your email?</h2>
             <p className="onb-q-sub">Used for payment receipts and account recovery.</p>
-            <input className="auth-input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" type="email" autoFocus />
+            <input className="auth-input" value={email} onChange={(e) => { setEmail(e.target.value); setEmailTaken(false); }} placeholder="you@example.com" type="email" autoFocus />
+            {emailChecking && <p style={{ fontSize: 12.5, color: '#94A3B8', marginTop: 6 }}>Checking…</p>}
+            {emailTaken && <p style={{ fontSize: 12.5, color: '#C8402A', marginTop: 6 }}>This email is already linked to another account.</p>}
           </>
         )}
 
@@ -162,12 +216,50 @@ export default function ProfileSetup() {
         {currentStep === 'state' && (
           <>
             <h2 className="onb-q-title">Where do you want to look?</h2>
-            <p className="onb-q-sub">You can change this anytime — even if you're browsing from somewhere else.</p>
-            <div className="onb-options-wrap">
-              {NIGERIAN_STATES.map((s) => (
-                <button key={s} className={`onb-option ${state === s ? 'active' : ''}`} onClick={() => setState(s)}>{s}</button>
-              ))}
+            <p className="onb-q-sub">We'll show you homes in your area first. You can change this anytime.</p>
+
+            <button
+              type="button"
+              onClick={handleDetectLocation}
+              disabled={detecting}
+              style={detectBtnStyle}
+            >
+              <PinIcon size={15} color={detecting ? '#94A3B8' : '#0F172A'} />
+              <span>{detecting ? 'Detecting your location…' : 'Use my current location'}</span>
+            </button>
+
+            {detectError && (
+              <p style={{ fontSize: 12.5, color: '#C8402A', marginTop: 6, lineHeight: '17px' }}>{detectError}</p>
+            )}
+
+            {state && (
+              <div style={detectedStateStyle}>
+                <span style={{ fontSize: 13, color: '#0F172A', fontWeight: 700 }}>📍 {state} detected</span>
+                <button type="button" style={changeStateBtn} onClick={() => { setState(null); setLocationAddress(''); }}>
+                  Change
+                </button>
+              </div>
+            )}
+
+            <div style={{ margin: '16px 0 6px', fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', color: '#94A3B8' }}>
+              Or search by area / city
             </div>
+            <LocationAutocomplete
+              value={locationAddress}
+              placeholder="e.g. Lekki, Victoria Island…"
+              onChange={({ address, rawState }) => {
+                setLocationAddress(address);
+                if (rawState) {
+                  const normalized = normalizeState(rawState);
+                  if (normalized) setState(normalized);
+                }
+              }}
+            />
+
+            <div style={{ margin: '16px 0 6px', fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', color: '#94A3B8' }}>
+              Or pick your state
+            </div>
+            <StateSelect value={state} onChange={setState} />
           </>
         )}
         {error && <p className="auth-error" style={{ marginTop: 16 }}>{error}</p>}
@@ -178,7 +270,9 @@ export default function ProfileSetup() {
           onClick={next}
           disabled={!canContinue || saving}
           style={{
-            height: 54, width: '100%', borderRadius: 999, border: 'none', background: 'var(--ink)', color: '#fff',
+            height: 54, width: '100%', borderRadius: 999, border: 'none',
+            background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: '#fff',
+            boxShadow: '0 4px 16px rgba(15,23,42,0.20)',
             fontSize: 15, fontWeight: 600, cursor: (!canContinue || saving) ? 'default' : 'pointer',
             opacity: (!canContinue || saving) ? 0.4 : 1,
           }}
@@ -189,3 +283,21 @@ export default function ProfileSetup() {
     </div>
   );
 }
+
+const detectBtnStyle = {
+  width: '100%', height: 50, borderRadius: 16, border: '1.5px solid #BFDBFE',
+  background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center',
+  gap: 10, cursor: 'pointer', fontSize: 14, fontWeight: 600, color: '#0F172A',
+  fontFamily: 'inherit', transition: 'background 0.15s',
+};
+
+const detectedStateStyle = {
+  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+  background: '#EEF6FF', border: '1px solid #BFDBFE', borderRadius: 14,
+  padding: '10px 14px', marginTop: 8,
+};
+
+const changeStateBtn = {
+  background: 'none', border: 'none', fontSize: 12.5, fontWeight: 700,
+  color: '#94A3B8', cursor: 'pointer', fontFamily: 'inherit',
+};

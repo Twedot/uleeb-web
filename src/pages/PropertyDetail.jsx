@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useListings } from '../context/ListingsContext';
 import { useBookmarks } from '../context/BookmarksContext';
@@ -5,6 +6,9 @@ import { useSentRequests } from '../context/SentRequestsContext';
 import { useAuth } from '../context/AuthContext';
 import { CheckIcon, ChevronLeftIcon, PinIcon } from '../components/icons';
 import { PhotoCarousel } from '../components/PhotoCarousel';
+import { Lightbox } from '../components/Lightbox';
+import { VideoPlayer } from '../components/VideoPlayer';
+import { MapView } from '../components/MapView';
 
 // Web counterpart to uleeb mobile's app/property/[id].tsx, including the
 // status banner ("your request is with the owner" / accepted / declined)
@@ -28,7 +32,7 @@ export default function PropertyDetail() {
   if (!item) {
     return (
       <div style={styles.notFound}>
-        <p style={{ color: '#5B5750' }}>This listing isn't available right now.</p>
+        <p style={{ color: '#475569' }}>This listing isn't available right now.</p>
         <button type="button" style={styles.backLink} onClick={() => navigate(-1)}>Go back</button>
       </div>
     );
@@ -37,6 +41,7 @@ export default function PropertyDetail() {
   const photos = item.photos ?? [];
   const status = getStatusFor(item.id);
   const requestId = sentRequests.find((r) => r.propertyId === item.id)?.id;
+  const [lightboxIndex, setLightboxIndex] = useState(null);
 
   async function handleRequest() {
     await sendRequest(item.id);
@@ -55,11 +60,13 @@ export default function PropertyDetail() {
   }
 
   return (
-    <div style={styles.screen}>
+    <>
+    <div style={styles.stickyBar}>
       <button type="button" onClick={() => navigate(-1)} style={styles.backLinkTop}>
-        <ChevronLeftIcon size={14} color="#5B5750" /> Back
+        <ChevronLeftIcon size={14} color="#475569" /> Back
       </button>
-
+    </div>
+    <div style={styles.screen}>
       <div className="uleeb-detail-layout" style={styles.layout}>
         {/* Left column: photo, sticky on wide screens like any real web
             listing page (Airbnb/Zillow-style two-column detail), not a
@@ -67,6 +74,7 @@ export default function PropertyDetail() {
         <div className="uleeb-detail-photo-col" style={styles.photoCol}>
           <PhotoCarousel
             photos={photos}
+            onPhotoClick={(i) => setLightboxIndex(i)}
             badge={
               <>
                 {item.verificationStatus === 'verified' && (
@@ -77,7 +85,7 @@ export default function PropertyDetail() {
                 {item.verificationStatus === 'under_review' && (
                   <div style={{ ...styles.chip, ...styles.verifiedBadge, background: '#FBF1DA', color: '#B8860B' }}>Under review</div>
                 )}
-                <div style={{ ...styles.chip, ...styles.matchBadge, background: '#131110', color: '#FFFFFF' }}>{item.matchScore}% match</div>
+                <div style={{ ...styles.chip, ...styles.matchBadge, background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)', color: '#FFFFFF' }}>{item.matchScore}% match</div>
               </>
             }
           />
@@ -85,15 +93,18 @@ export default function PropertyDetail() {
           {item.videoUrl && (
             <>
               <p style={styles.label}>Walkthrough video</p>
-              <video src={item.videoUrl} controls style={styles.video} />
+              <VideoPlayer src={item.videoUrl} />
             </>
           )}
+
+          <p style={styles.label}>Location</p>
+          <MapView lat={item.lat} lng={item.lng} state={item.state} />
         </div>
 
         <div style={styles.body}>
           <p style={styles.title}>{item.title}</p>
           <div style={styles.locationRow}>
-            <PinIcon size={13} color="#9B968C" />
+            <PinIcon size={13} color="#94A3B8" />
             <span style={styles.location}>{item.location}, {item.state}, {item.country}</span>
           </div>
 
@@ -140,7 +151,7 @@ export default function PropertyDetail() {
           <div style={styles.amenitiesWrap}>
             {(item.amenities ?? []).map((a) => (
               <div key={a} style={styles.amenity}>
-                <CheckIcon size={13} color="#5B5750" strokeWidth={2.2} />
+                <CheckIcon size={13} color="#475569" strokeWidth={2.2} />
                 <span style={styles.amenityText}>{a}</span>
               </div>
             ))}
@@ -148,53 +159,68 @@ export default function PropertyDetail() {
         </div>
       </div>
     </div>
+
+    {lightboxIndex !== null && (
+      <Lightbox
+        photos={photos}
+        index={lightboxIndex}
+        onClose={() => setLightboxIndex(null)}
+        onPrev={() => setLightboxIndex((i) => Math.max(0, i - 1))}
+        onNext={() => setLightboxIndex((i) => Math.min(photos.length - 1, i + 1))}
+      />
+    )}
+    </>
   );
 }
 
 const styles = {
+  stickyBar: {
+    position: 'sticky', top: 64, zIndex: 100,
+    background: '#FFFFFF', borderBottom: '1px solid #F1F5F9',
+    padding: '10px 24px',
+  },
   screen: { maxWidth: 1000, margin: '0 auto', padding: '24px 24px 48px' },
   notFound: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: 12 },
-  backLink: { background: 'none', border: 'none', color: '#131110', fontWeight: 600, cursor: 'pointer' },
+  backLink: { background: 'none', border: 'none', color: '#0F172A', fontWeight: 600, cursor: 'pointer' },
   backLinkTop: {
-    display: 'flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', color: '#5B5750',
-    fontSize: 13.5, fontWeight: 600, cursor: 'pointer', padding: '4px 0', marginBottom: 16,
+    display: 'flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', color: '#475569',
+    fontSize: 13.5, fontWeight: 600, cursor: 'pointer', padding: '4px 0',
   },
   layout: { display: 'grid', gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 1fr)', gap: 40 },
   photoCol: { position: 'sticky', top: 88, alignSelf: 'start' },
   chip: { display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 600, padding: '6px 12px', borderRadius: 999, position: 'absolute' },
   verifiedBadge: { top: 16, right: 20 },
-  matchBadge: { bottom: 14, left: 16 },
+  matchBadge: { bottom: 14, left: 16, boxShadow: '0 2px 8px rgba(37,99,235,0.3)' },
   body: { display: 'flex', flexDirection: 'column', gap: 4 },
-  title: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 26, color: '#181614', marginBottom: 6 },
+  title: { fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 26, color: '#0F172A', marginBottom: 6 },
   locationRow: { display: 'flex', alignItems: 'center', gap: 5, marginBottom: 14 },
-  location: { fontSize: 13.5, color: '#9B968C' },
+  location: { fontSize: 13.5, color: '#94A3B8' },
   factsRow: { display: 'flex', gap: 6, marginBottom: 10 },
-  fact: { fontSize: 14, color: '#5B5750', fontWeight: 500 },
-  factDot: { fontSize: 14, color: '#9B968C' },
+  fact: { fontSize: 14, color: '#475569', fontWeight: 500 },
+  factDot: { fontSize: 14, color: '#94A3B8' },
   priceRow: { display: 'flex', alignItems: 'baseline', marginBottom: 20 },
-  price: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 28, color: '#181614' },
-  priceUnit: { fontSize: 13.5, color: '#9B968C' },
-  label: { fontSize: 11, fontWeight: 600, letterSpacing: 0.8, textTransform: 'uppercase', color: '#9B968C', marginTop: 24, marginBottom: 10 },
-  video: { width: '100%', height: 220, borderRadius: 16, background: '#131110', objectFit: 'cover', marginTop: 12 },
+  price: { fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 28, color: '#0F172A' },
+  priceUnit: { fontSize: 13.5, color: '#94A3B8' },
+  label: { fontSize: 11, fontWeight: 600, letterSpacing: 0.8, textTransform: 'uppercase', color: '#94A3B8', marginTop: 24, marginBottom: 10 },
   amenitiesWrap: { display: 'flex', flexWrap: 'wrap', gap: 10 },
   amenity: {
     display: 'flex', alignItems: 'center', gap: 8, background: '#FFFFFF',
-    border: '1px solid #EFEDE6', borderRadius: 12, padding: '10px 12px',
+    border: '1px solid #DBEAFE', borderRadius: 12, padding: '10px 12px',
   },
-  amenityText: { fontSize: 12.5, color: '#181614', fontWeight: 500 },
+  amenityText: { fontSize: 12.5, color: '#0F172A', fontWeight: 500 },
   actions: { display: 'flex', gap: 10, marginBottom: 8 },
   saveBtn: {
-    flex: 1, height: 50, borderRadius: 999, background: '#FFFFFF', border: '1.5px solid #E6E3DB',
-    fontSize: 14, fontWeight: 600, color: '#181614', cursor: 'pointer',
+    flex: 1, height: 50, borderRadius: 999, background: '#FFFFFF', border: '1.5px solid #BFDBFE',
+    fontSize: 14, fontWeight: 600, color: '#0F172A', cursor: 'pointer',
   },
   requestBtn: {
-    flex: 2, height: 50, borderRadius: 999, background: '#131110', border: 'none',
+    flex: 2, height: 50, borderRadius: 999, background: '#0F172A', border: 'none',
     fontSize: 14, fontWeight: 600, color: '#FFFFFF', cursor: 'pointer',
   },
-  statusBanner: { background: '#F0EFE9', borderRadius: 16, padding: 14, marginBottom: 8, display: 'flex', flexDirection: 'column', gap: 10 },
-  statusText: { fontSize: 13, color: '#5B5750', lineHeight: '19px' },
+  statusBanner: { background: '#EEF6FF', borderRadius: 16, padding: 14, marginBottom: 8, display: 'flex', flexDirection: 'column', gap: 10 },
+  statusText: { fontSize: 13, color: '#475569', lineHeight: '19px' },
   messageOwnerBtn: {
-    height: 42, borderRadius: 999, background: '#131110', border: 'none', color: '#FFFFFF',
+    height: 42, borderRadius: 999, background: '#0F172A', border: 'none', color: '#FFFFFF',
     fontSize: 13.5, fontWeight: 600, cursor: 'pointer', alignSelf: 'flex-start', padding: '0 20px',
   },
 };

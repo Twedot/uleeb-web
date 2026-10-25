@@ -2,11 +2,15 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useProperties } from '../context/PropertiesContext';
 import { ChevronLeftIcon, UploadIcon, FileIcon, XIcon } from '../components/icons';
-
-const NIGERIAN_STATES = ['Lagos', 'Abuja (FCT)', 'Rivers', 'Oyo', 'Ogun', 'Kano', 'Enugu', 'Kaduna'];
+import { MapPicker } from '../components/MapPicker';
+import { LocationAutocomplete } from '../components/LocationAutocomplete';
+import { StateSelect } from '../components/StateSelect';
+import { normalizeState } from '../lib/nigeria';
 const AMENITIES = [
-  'Kitchen', 'Wardrobe', 'Parking', 'Generator', 'Water supply', '24/7 security',
-  'Furnished', 'Air conditioning', 'Wifi', 'Fenced compound', 'Balcony', 'Swimming pool',
+  'Kitchen', 'Wardrobe', 'Parking', 'Generator', 'Inverter', 'Solar panels',
+  'Water supply', 'Borehole', 'Prepaid meter', '24/7 security', 'CCTV', 'Gateman',
+  'Furnished', 'Air conditioning', 'Wifi', 'Fenced compound', 'Boys quarter',
+  'Balcony', 'Swimming pool', 'Gym', 'Elevator', 'Garden', 'Rooftop terrace', 'Intercom',
 ];
 const MIN_PHOTOS = 5;
 
@@ -27,20 +31,21 @@ export default function EditProperty() {
   const [country] = useState(original?.country ?? 'Nigeria');
   const [price, setPrice] = useState(String(original?.price ?? ''));
   const [bedrooms, setBedrooms] = useState(String(original?.bedrooms ?? ''));
-  const [bathrooms, setBathrooms] = useState(String(original?.bathrooms ?? ''));
   const [size, setSize] = useState(String(original?.sizeSqm ?? ''));
   const [amenities, setAmenities] = useState(original?.amenities ?? []);
   const [existingPhotos, setExistingPhotos] = useState(original?.photos ?? []);
   const [newPhotos, setNewPhotos] = useState([]);
   const [video, setVideo] = useState(null);
   const [document, setDocument] = useState(null);
+  const [pinLat, setPinLat] = useState(original?.lat ?? null);
+  const [pinLng, setPinLng] = useState(original?.lng ?? null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
 
   if (!original) {
     return (
       <div style={styles.screen}>
-        <p style={{ color: '#5B5750' }}>This property isn't available right now.</p>
+        <p style={{ color: '#475569' }}>This property isn't available right now.</p>
         <button type="button" style={styles.backLink} onClick={() => navigate('/properties')}>Back to your properties</button>
       </div>
     );
@@ -84,9 +89,10 @@ export default function EditProperty() {
         country: country.trim(),
         price: Number(price) || 0,
         bedrooms: Number(bedrooms) || 0,
-        bathrooms: Number(bathrooms) || 0,
         sizeSqm: Number(size) || 0,
         amenities,
+        lat: pinLat ?? undefined,
+        lng: pinLng ?? undefined,
       });
 
       // Only touch photos if something actually changed — no point
@@ -111,7 +117,7 @@ export default function EditProperty() {
     <div style={styles.screen}>
       <div style={styles.header}>
         <button type="button" style={styles.backLink} onClick={() => navigate(-1)}>
-          <ChevronLeftIcon size={14} color="#5B5750" /> Back
+          <ChevronLeftIcon size={14} color="#475569" /> Back
         </button>
       </div>
 
@@ -124,28 +130,39 @@ export default function EditProperty() {
         </Field>
 
         <Field label="Address / area">
-          <input style={styles.input} value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Off Admiralty Way" />
+          <LocationAutocomplete
+            value={location}
+            placeholder="Start typing an address or area…"
+            onChange={({ address, rawState, lat, lng }) => {
+              setLocation(address);
+              if (rawState) {
+                const normalized = normalizeState(rawState);
+                if (normalized) setState(normalized);
+              }
+              if (lat && lng) { setPinLat(lat); setPinLng(lng); }
+            }}
+          />
         </Field>
 
         <Field label="State">
-          <div style={styles.optionsWrap}>
-            {NIGERIAN_STATES.map((s) => (
-              <button key={s} type="button" style={{ ...styles.option, ...(state === s ? styles.optionActive : null) }} onClick={() => setState(s)}>
-                {s}
-              </button>
-            ))}
-          </div>
+          <StateSelect value={state} onChange={setState} />
         </Field>
 
-        <div style={styles.row3}>
+        <Field label="Pin exact location (optional)">
+          <MapPicker
+            state={state}
+            lat={pinLat}
+            lng={pinLng}
+            onChange={({ lat, lng }) => { setPinLat(lat); setPinLng(lng); }}
+          />
+        </Field>
+
+        <div style={styles.row2}>
           <Field label="Price / yr (₦)">
             <input style={styles.input} value={price} onChange={(e) => setPrice(e.target.value.replace(/[^0-9]/g, ''))} inputMode="numeric" placeholder="2400000" />
           </Field>
           <Field label="Bedrooms">
             <input style={styles.input} value={bedrooms} onChange={(e) => setBedrooms(e.target.value.replace(/[^0-9]/g, ''))} inputMode="numeric" placeholder="2" />
-          </Field>
-          <Field label="Bathrooms">
-            <input style={styles.input} value={bathrooms} onChange={(e) => setBathrooms(e.target.value.replace(/[^0-9]/g, ''))} inputMode="numeric" placeholder="2" />
           </Field>
         </div>
 
@@ -182,8 +199,8 @@ export default function EditProperty() {
               </div>
             ))}
             <label style={styles.photoAdd}>
-              <UploadIcon size={18} color="#5B5750" />
-              <span style={{ fontSize: 11, color: '#5B5750', marginTop: 4 }}>Add</span>
+              <UploadIcon size={18} color="#475569" />
+              <span style={{ fontSize: 11, color: '#475569', marginTop: 4 }}>Add</span>
               <input type="file" accept="image/*" multiple onChange={handlePhotoPick} style={{ display: 'none' }} />
             </label>
           </div>
@@ -193,15 +210,15 @@ export default function EditProperty() {
         <Field label="Walkthrough video (optional)">
           {video ? (
             <div style={styles.fileRow}>
-              <FileIcon size={16} color="#5B5750" />
+              <FileIcon size={16} color="#475569" />
               <span style={styles.fileName}>{video.name}</span>
               <button type="button" style={styles.fileRemove} onClick={() => setVideo(null)} aria-label="Remove video">
-                <XIcon size={12} color="#5B5750" />
+                <XIcon size={12} color="#475569" />
               </button>
             </div>
           ) : original.videoUrl ? (
             <div style={styles.fileRow}>
-              <FileIcon size={16} color="#5B5750" />
+              <FileIcon size={16} color="#475569" />
               <span style={styles.fileName}>Current video</span>
               <label style={styles.replaceLink}>
                 Replace
@@ -210,8 +227,8 @@ export default function EditProperty() {
             </div>
           ) : (
             <label style={styles.uploadRow}>
-              <UploadIcon size={16} color="#5B5750" />
-              <span style={{ fontSize: 13.5, color: '#5B5750', fontWeight: 600 }}>Upload a video</span>
+              <UploadIcon size={16} color="#475569" />
+              <span style={{ fontSize: 13.5, color: '#475569', fontWeight: 600 }}>Upload a video</span>
               <input type="file" accept="video/*" onChange={(e) => setVideo(e.target.files?.[0] ?? null)} style={{ display: 'none' }} />
             </label>
           )}
@@ -220,15 +237,15 @@ export default function EditProperty() {
         <Field label="Ownership document (optional)">
           {document ? (
             <div style={styles.fileRow}>
-              <FileIcon size={16} color="#5B5750" />
+              <FileIcon size={16} color="#475569" />
               <span style={styles.fileName}>{document.name}</span>
               <button type="button" style={styles.fileRemove} onClick={() => setDocument(null)} aria-label="Remove document">
-                <XIcon size={12} color="#5B5750" />
+                <XIcon size={12} color="#475569" />
               </button>
             </div>
           ) : original.documentUrl ? (
             <div style={styles.fileRow}>
-              <FileIcon size={16} color="#5B5750" />
+              <FileIcon size={16} color="#475569" />
               <span style={styles.fileName}>Current document</span>
               <label style={styles.replaceLink}>
                 Replace
@@ -237,8 +254,8 @@ export default function EditProperty() {
             </div>
           ) : (
             <label style={styles.uploadRow}>
-              <UploadIcon size={16} color="#5B5750" />
-              <span style={{ fontSize: 13.5, color: '#5B5750', fontWeight: 600 }}>Upload a document</span>
+              <UploadIcon size={16} color="#475569" />
+              <span style={{ fontSize: 13.5, color: '#475569', fontWeight: 600 }}>Upload a document</span>
               <input type="file" accept="application/pdf,image/*" onChange={(e) => setDocument(e.target.files?.[0] ?? null)} style={{ display: 'none' }} />
             </label>
           )}
@@ -267,27 +284,27 @@ const styles = {
   screen: { maxWidth: 640, margin: '0 auto', padding: '24px 24px 64px' },
   header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
   backLink: {
-    display: 'flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', color: '#5B5750',
+    display: 'flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', color: '#475569',
     fontSize: 13.5, fontWeight: 600, cursor: 'pointer', padding: '4px 0',
   },
-  title: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 26, color: '#181614', marginBottom: 6 },
-  subtitle: { fontSize: 13.5, color: '#5B5750', marginBottom: 28 },
+  title: { fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 26, color: '#0F172A', marginBottom: 6 },
+  subtitle: { fontSize: 13.5, color: '#475569', marginBottom: 28 },
   form: { display: 'flex', flexDirection: 'column', gap: 20 },
   field: { display: 'flex', flexDirection: 'column' },
-  label: { fontSize: 11, fontWeight: 600, letterSpacing: 0.6, textTransform: 'uppercase', color: '#9B968C', marginBottom: 8 },
+  label: { fontSize: 11, fontWeight: 600, letterSpacing: 0.6, textTransform: 'uppercase', color: '#94A3B8', marginBottom: 8 },
   input: {
-    height: 50, borderRadius: 16, border: '1px solid #E6E3DB', background: '#FFFFFF',
-    padding: '0 16px', fontSize: 14.5, color: '#181614', outline: 'none', fontFamily: 'inherit',
+    height: 50, borderRadius: 16, border: '1px solid #BFDBFE', background: '#FFFFFF',
+    padding: '0 16px', fontSize: 14.5, color: '#0F172A', outline: 'none', fontFamily: 'inherit',
   },
-  row3: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 },
+  row2: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 },
   optionsWrap: { display: 'flex', flexWrap: 'wrap', gap: 8 },
   option: {
-    padding: '9px 15px', borderRadius: 999, border: '1px solid #E6E3DB', background: '#FFFFFF',
-    fontSize: 13, fontWeight: 600, color: '#181614', cursor: 'pointer',
+    padding: '9px 15px', borderRadius: 999, border: '1px solid #BFDBFE', background: '#FFFFFF',
+    fontSize: 13, fontWeight: 600, color: '#0F172A', cursor: 'pointer',
   },
-  optionActive: { background: '#131110', borderColor: '#131110', color: '#FFFFFF' },
+  optionActive: { background: '#2563EB', borderColor: '#2563EB', color: '#FFFFFF' },
   photoGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(84px, 1fr))', gap: 10 },
-  photoThumb: { position: 'relative', width: '100%', aspectRatio: '1', borderRadius: 14, overflow: 'hidden', background: '#F0EFE9' },
+  photoThumb: { position: 'relative', width: '100%', aspectRatio: '1', borderRadius: 14, overflow: 'hidden', background: '#EEF6FF' },
   photoImg: { width: '100%', height: '100%', objectFit: 'cover' },
   photoRemove: {
     position: 'absolute', top: 4, right: 4, width: 20, height: 20, borderRadius: 999,
@@ -295,24 +312,26 @@ const styles = {
     display: 'flex', alignItems: 'center', justifyContent: 'center',
   },
   photoAdd: {
-    aspectRatio: '1', borderRadius: 14, border: '1.5px dashed #D8D5CC', background: '#F7F6F2',
+    aspectRatio: '1', borderRadius: 14, border: '1.5px dashed #BFDBFE', background: '#EEF6FF',
     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
   },
-  hint: { fontSize: 11.5, color: '#9B968C', marginTop: 8 },
+  hint: { fontSize: 11.5, color: '#94A3B8', marginTop: 8 },
   uploadRow: {
     display: 'flex', alignItems: 'center', gap: 10, height: 50, borderRadius: 16,
-    border: '1px dashed #D8D5CC', background: '#F7F6F2', padding: '0 16px', cursor: 'pointer',
+    border: '1px dashed #BFDBFE', background: '#EEF6FF', padding: '0 16px', cursor: 'pointer',
   },
   fileRow: {
     display: 'flex', alignItems: 'center', gap: 10, height: 50, borderRadius: 16,
-    border: '1px solid #E6E3DB', background: '#FFFFFF', padding: '0 16px',
+    border: '1px solid #BFDBFE', background: '#FFFFFF', padding: '0 16px',
   },
-  fileName: { flex: 1, fontSize: 13.5, color: '#181614', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+  fileName: { flex: 1, fontSize: 13.5, color: '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
   fileRemove: { background: 'none', border: 'none', cursor: 'pointer', display: 'flex' },
-  replaceLink: { fontSize: 12.5, fontWeight: 700, color: '#131110', cursor: 'pointer' },
+  replaceLink: { fontSize: 12.5, fontWeight: 700, color: '#2563EB', cursor: 'pointer' },
   error: { fontSize: 13, color: '#C8402A' },
   submitBtn: {
-    height: 54, borderRadius: 999, border: 'none', background: '#131110', color: '#FFFFFF',
+    height: 54, borderRadius: 999, border: 'none',
+    background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: '#FFFFFF',
     fontSize: 15, fontWeight: 600, cursor: 'pointer', marginTop: 8,
+    boxShadow: '0 4px 16px rgba(15,23,42,0.20)',
   },
 };

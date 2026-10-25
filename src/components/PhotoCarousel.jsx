@@ -3,8 +3,8 @@ import { ChevronLeftIcon, ChevronRightIcon, HomeIcon } from './icons';
 
 // Shared photo viewer for both property detail pages (tenant-facing and
 // the landlord's own) — a real prev/next carousel with visible caret
-// buttons, not just invisible tap zones either side of the image.
-export function PhotoCarousel({ photos = [], height = 460, badge, borderRadius = 24 }) {
+// buttons. Pass onPhotoClick to enable fullscreen on click.
+export function PhotoCarousel({ photos = [], height = 460, badge, borderRadius = 24, onPhotoClick }) {
   const [index, setIndex] = useState(0);
   const hasPhotos = photos.length > 0;
   const hasMultiple = photos.length > 1;
@@ -21,19 +21,24 @@ export function PhotoCarousel({ photos = [], height = 460, badge, borderRadius =
   return (
     <div style={{ ...styles.area, height, borderRadius }}>
       {hasPhotos ? (
-        <img src={photos[index]} alt="" style={styles.image} />
+        <img
+          src={photos[index]}
+          alt=""
+          style={{ ...styles.image, ...(onPhotoClick ? styles.imageClickable : null) }}
+          onClick={onPhotoClick ? () => onPhotoClick(index) : undefined}
+        />
       ) : (
         <HomeIcon size={44} color="#D8D5CC" />
       )}
 
       {hasMultiple && index > 0 && (
         <button type="button" onClick={prev} aria-label="Previous photo" style={{ ...styles.caret, left: 12 }}>
-          <ChevronLeftIcon size={16} color="#181614" />
+          <ChevronLeftIcon size={16} color="#0F172A" />
         </button>
       )}
       {hasMultiple && index < photos.length - 1 && (
         <button type="button" onClick={next} aria-label="Next photo" style={{ ...styles.caret, right: 12 }}>
-          <ChevronRightIcon size={16} color="#181614" />
+          <ChevronRightIcon size={16} color="#0F172A" />
         </button>
       )}
 
@@ -56,6 +61,7 @@ const styles = {
     overflow: 'hidden',
   },
   image: { width: '100%', height: '100%', objectFit: 'cover' },
+  imageClickable: { cursor: 'zoom-in' },
   caret: {
     position: 'absolute', top: '50%', transform: 'translateY(-50%)', width: 36, height: 36, borderRadius: 999,
     background: 'rgba(255,255,255,0.9)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center',

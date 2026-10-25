@@ -3,39 +3,77 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ChevronLeftIcon, CheckIcon } from '../components/icons';
 
-// Web counterpart to uleeb mobile's app/plans.tsx — same tiers/copy/
-// pricing, same role-branched feature lists. Paystack checkout is a full-
-// page redirect here instead of an in-app browser sheet; verifyUpgrade
-// runs automatically on return (see the ?reference= handling below).
 const PRICE_NAIRA = { plus: 3500, pro: 4300 };
-const MONTH_OPTIONS = [1, 3, 6, 12];
+
+const BILLING_OPTIONS = [
+  { label: '1 month', months: 1 },
+  { label: '3 months', months: 3 },
+  { label: '6 months', months: 6 },
+  { label: '12 months', months: 12 },
+];
 
 const TENANT_TIERS = [
   {
-    plan: 'free', title: 'Free', price: '₦0',
+    plan: 'free', title: 'Free',
+    tag: 'Free for every user.',
     features: [
-      '15 swipes per day', 'Filter by one state at a time', 'No bookmarking',
-      'Call or WhatsApp only — no in-app chat', 'Schedule or reschedule inspections',
-      'Profile can be changed once every 15 days',
+      '15 swipes per day',
+      'Filter by one state at a time',
+      'No bookmarking',
+      'Call or WhatsApp only',
+      'Profile lock: 15-day cooldown',
     ],
+    ctaLabel: 'Get Started Free',
+    bg: '#F4C8DC',
   },
   {
-    plan: 'plus', title: 'Plus', price: '₦3,500/mo',
+    plan: 'plus', title: 'Plus',
+    tag: 'Ideal for active home hunters.',
     features: [
-      'Unlimited swipes', 'Filter by multiple states', 'Revisit and bookmark properties',
-      'Search your own country only', 'Call or WhatsApp only — no in-app chat', 'Change your profile anytime',
+      'Unlimited swipes',
+      'Multi-state filtering',
+      'Bookmark properties',
+      'In-country search',
+      'Change profile anytime',
     ],
+    ctaLabel: 'Get Plus',
+    bg: '#C8F23E',
   },
   {
-    plan: 'pro', title: 'Pro', price: '₦4,300/mo',
-    features: ['Everything in Plus', 'Search any country', 'Full in-app chat with the other party'],
+    plan: 'pro', title: 'Pro',
+    tag: 'For power users — zero limits.',
+    features: [
+      'Everything in Plus',
+      'Search any country',
+      'Full in-app chat with landlords',
+    ],
+    ctaLabel: 'Get Pro',
+    bg: '#F5CC38',
   },
 ];
 
 const LANDLORD_TIERS = [
-  { plan: 'free', title: 'Free', price: '₦0', features: ['List 1 property', 'Profile can be changed once every 15 days'] },
-  { plan: 'plus', title: 'Plus', price: '₦3,500/mo', features: ['Unlimited property listings', 'Change your profile anytime'] },
-  { plan: 'pro', title: 'Pro', price: '₦4,300/mo', features: ['List up to 5 properties', 'Change your profile anytime'] },
+  {
+    plan: 'free', title: 'Free',
+    tag: 'Free for every landlord.',
+    features: ['List 1 property', 'Profile lock: 15-day cooldown'],
+    ctaLabel: 'Get Started Free',
+    bg: '#F4C8DC',
+  },
+  {
+    plan: 'plus', title: 'Plus',
+    tag: 'For growing landlords.',
+    features: ['List up to 5 properties', 'Change profile anytime'],
+    ctaLabel: 'Get Plus',
+    bg: '#C8F23E',
+  },
+  {
+    plan: 'pro', title: 'Pro',
+    tag: 'No ceilings, no limits.',
+    features: ['Unlimited property listings', 'Change profile anytime', 'Priority visibility'],
+    ctaLabel: 'Get Pro',
+    bg: '#F5CC38',
+  },
 ];
 
 export default function Plans() {
@@ -44,11 +82,10 @@ export default function Plans() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [working, setWorking] = useState(null);
   const [verifying, setVerifying] = useState(false);
-  const [months, setMonths] = useState({});
+  const [billingMonths, setBillingMonths] = useState(1);
   const currentPlan = user?.plan ?? 'free';
   const tiers = user?.role === 'landlord' ? LANDLORD_TIERS : TENANT_TIERS;
 
-  // Paystack redirected back here — finish the upgrade and clean the URL.
   useEffect(() => {
     const reference = searchParams.get('reference') || searchParams.get('trxref');
     if (!reference) return;
@@ -66,8 +103,7 @@ export default function Plans() {
     if (plan === currentPlan) return;
     setWorking(plan);
     try {
-      await initiateUpgrade(plan, months[plan] ?? 1);
-      // Page navigates away to Paystack on success — nothing else to do here.
+      await initiateUpgrade(plan, billingMonths);
     } catch (err) {
       window.alert(err instanceof Error ? err.message : 'Could not start checkout — please try again.');
       setWorking(null);
@@ -75,114 +111,166 @@ export default function Plans() {
   }
 
   return (
-    <div style={styles.screen}>
-      <button type="button" onClick={() => navigate(-1)} style={styles.backLink}>
-        <ChevronLeftIcon size={14} color="#5B5750" /> Back
-      </button>
-      <h1 style={styles.title}>Plans</h1>
-      <p style={styles.subtitle}>Upgrade anytime — takes effect as soon as payment is confirmed.</p>
+    <div style={s.page}>
+      <div style={s.inner}>
+        <button type="button" onClick={() => navigate(-1)} style={s.backBtn}>
+          <ChevronLeftIcon size={14} color="#94A3B8" />
+          <span>Back</span>
+        </button>
 
-      {verifying && <p style={styles.verifyingNote}>Confirming your payment…</p>}
+        <h1 style={s.heading}>Plans</h1>
+        <p style={s.sub}>Upgrade anytime — takes effect once payment is confirmed.</p>
 
-      <div style={styles.grid}>
-        {tiers.map((tier) => {
-          const isCurrent = tier.plan === currentPlan;
-          const isFree = tier.plan === 'free';
-          const selectedMonths = months[tier.plan] ?? 1;
-          const price = PRICE_NAIRA[tier.plan];
-          const total = price ? price * selectedMonths : 0;
+        {verifying && <p style={s.verifying}>Confirming your payment…</p>}
 
-          return (
-            <div key={tier.plan} style={{ ...styles.card, ...(isCurrent ? styles.cardActive : null) }}>
-              <div style={styles.cardHeader}>
-                <span style={styles.cardTitle}>{tier.title}</span>
-                <span style={styles.cardPrice}>{tier.price}</span>
-              </div>
-              {tier.features.map((f) => (
-                <div key={f} style={styles.featureRow}>
-                  <CheckIcon size={13} color="#5B5750" strokeWidth={2.2} />
-                  <span style={styles.featureText}>{f}</span>
-                </div>
-              ))}
-              {isCurrent ? (
-                <>
-                  <div style={{ ...styles.selectBtn, ...styles.selectBtnCurrent }}>Current plan</div>
-                  {!isFree && user?.planExpiresAt && (
-                    <p style={styles.expiryNote}>
-                      Renews or lapses to Free on{' '}
-                      {new Date(user.planExpiresAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                      {' — paying again here extends it further.'}
-                    </p>
+        <div style={s.billingRow}>
+          {BILLING_OPTIONS.map((opt) => (
+            <button
+              key={opt.months}
+              type="button"
+              onClick={() => setBillingMonths(opt.months)}
+              style={{ ...s.billingChip, ...(billingMonths === opt.months ? s.billingChipActive : null) }}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+
+        <div style={s.grid}>
+          {tiers.map((tier) => {
+            const isCurrent = tier.plan === currentPlan;
+            const isFree = tier.plan === 'free';
+            const monthlyPrice = PRICE_NAIRA[tier.plan] ?? 0;
+            const total = monthlyPrice * billingMonths;
+
+            return (
+              <div key={tier.plan} style={{ ...s.card, background: tier.bg }}>
+                <p style={s.cardLabel}>{tier.title}</p>
+
+                <p style={s.cardPrice}>
+                  {isFree
+                    ? 'Free'
+                    : `₦${(billingMonths === 1 ? monthlyPrice : total).toLocaleString()}`}
+                  {!isFree && (
+                    <span style={s.cardPricePer}>
+                      {billingMonths === 1 ? '/month' : `/ ${billingMonths} months`}
+                    </span>
                   )}
-                </>
-              ) : isFree ? (
-                <p style={styles.freeNote}>Your account starts here — no switching back once upgraded.</p>
-              ) : (
-                <>
-                  <div style={styles.monthsRow}>
-                    {MONTH_OPTIONS.map((m) => {
-                      const active = selectedMonths === m;
-                      return (
-                        <button
-                          key={m}
-                          type="button"
-                          onClick={() => setMonths((prev) => ({ ...prev, [tier.plan]: m }))}
-                          style={{ ...styles.monthChip, ...(active ? styles.monthChipActive : null) }}
-                        >
-                          {m === 1 ? '1 month' : `${m} months`}
-                        </button>
-                      );
-                    })}
-                  </div>
+                </p>
+                {!isFree && billingMonths > 1 && (
+                  <p style={s.cardMonthlyNote}>₦{monthlyPrice.toLocaleString()} / month</p>
+                )}
+
+                <p style={s.cardTag}>{tier.tag}</p>
+
+                <div style={s.features}>
+                  {tier.features.map((f) => (
+                    <div key={f} style={s.featureRow}>
+                      <span style={s.checkCircle}>
+                        <CheckIcon size={10} color="#FFFFFF" strokeWidth={3} />
+                      </span>
+                      <span style={s.featureText}>{f}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {isCurrent ? (
+                  <div style={s.currentBadge}>Current plan</div>
+                ) : isFree ? (
+                  <p style={s.freeNote}>Your starting point — always here.</p>
+                ) : (
                   <button
                     type="button"
                     onClick={() => handleSelect(tier.plan)}
                     disabled={working !== null}
-                    style={{ ...styles.selectBtn, ...(working !== null ? { opacity: 0.5 } : null) }}
+                    style={{ ...s.ctaBtn, ...(working !== null ? { opacity: 0.55, cursor: 'default' } : null) }}
                   >
-                    {working === tier.plan ? 'Redirecting…' : `Pay ₦${total.toLocaleString()} & switch to ${tier.title}`}
+                    {working === tier.plan
+                      ? 'Redirecting…'
+                      : `${tier.ctaLabel} · ₦${total.toLocaleString()}`}
                   </button>
-                </>
-              )}
-            </div>
-          );
-        })}
-      </div>
+                )}
 
-      <p style={styles.fineprint}>Paid plans are billed via Paystack.</p>
+                {isCurrent && !isFree && user?.planExpiresAt && (
+                  <p style={s.expiryNote}>
+                    Renews or lapses to Free on{' '}
+                    {new Date(user.planExpiresAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}.
+                    Paying again extends it further.
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <p style={s.fineprint}>Paid plans billed via Paystack. Cancel anytime.</p>
+      </div>
     </div>
   );
 }
 
-const styles = {
-  screen: { maxWidth: 900, margin: '0 auto', padding: '24px 24px 48px' },
-  backLink: {
-    display: 'flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', color: '#5B5750',
-    fontSize: 13.5, fontWeight: 600, cursor: 'pointer', padding: '4px 0', marginBottom: 16,
+const s = {
+  page: {
+    minHeight: 'calc(100dvh - 64px)', padding: '0 0 64px',
   },
-  title: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 28, color: '#181614' },
-  subtitle: { fontSize: 13.5, color: '#5B5750', marginTop: 6, marginBottom: 24, lineHeight: '20px' },
-  verifyingNote: { fontSize: 13, color: '#2F8F55', fontWeight: 600, marginBottom: 16 },
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 },
-  card: { background: '#FFFFFF', border: '1.5px solid #EFEDE6', borderRadius: 24, padding: 18 },
-  cardActive: { borderColor: '#131110' },
-  cardHeader: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 14 },
-  cardTitle: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 19, color: '#181614' },
-  cardPrice: { fontSize: 13.5, fontWeight: 600, color: '#9B968C' },
-  featureRow: { display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 },
-  featureText: { fontSize: 13, color: '#5B5750' },
-  monthsRow: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, marginTop: 12 },
-  monthChip: {
-    padding: '9px 4px', borderRadius: 999, border: '1px solid #E6E3DB',
-    background: '#F0EFE9', fontSize: 12.5, fontWeight: 600, color: '#181614', cursor: 'pointer',
+  inner: { maxWidth: 960, margin: '0 auto', padding: '36px 24px 0' },
+  backBtn: {
+    display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none',
+    color: '#475569', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', padding: '4px 0', marginBottom: 32,
   },
-  monthChipActive: { background: '#131110', borderColor: '#131110', color: '#FFFFFF' },
-  selectBtn: {
-    width: '100%', height: 46, borderRadius: 999, background: '#131110', border: 'none',
-    color: '#FFFFFF', fontSize: 14, fontWeight: 600, cursor: 'pointer', marginTop: 10,
+  heading: {
+    fontFamily: "'Poppins', sans-serif", fontWeight: 800, fontSize: 40, color: '#0F172A',
+    textAlign: 'center', marginBottom: 10, lineHeight: 1.1,
   },
-  selectBtnCurrent: { background: '#F0EFE9', color: '#9B968C' },
-  freeNote: { fontSize: 12, color: '#9B968C', textAlign: 'center', marginTop: 10, lineHeight: '17px' },
-  expiryNote: { fontSize: 11.5, color: '#9B968C', textAlign: 'center', marginTop: 8, lineHeight: '16px' },
-  fineprint: { fontSize: 11.5, color: '#9B968C', textAlign: 'center', marginTop: 24 },
+  sub: { fontSize: 14, color: '#64748B', textAlign: 'center', marginBottom: 28, lineHeight: '20px' },
+  verifying: { fontSize: 13, color: '#0F172A', fontWeight: 600, textAlign: 'center', marginBottom: 16 },
+  billingRow: {
+    display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 40,
+  },
+  billingChip: {
+    padding: '9px 20px', borderRadius: 999, border: '1px solid #BFDBFE',
+    background: '#FFFFFF', color: '#64748B', fontSize: 13, fontWeight: 600,
+    cursor: 'pointer', fontFamily: 'inherit',
+  },
+  billingChipActive: {
+    background: '#0F172A', borderColor: '#0F172A', color: '#FFFFFF',
+  },
+  grid: {
+    display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16,
+    alignItems: 'start',
+  },
+  card: {
+    borderRadius: 24, padding: '28px 24px 24px', display: 'flex', flexDirection: 'column',
+  },
+  cardLabel: {
+    fontSize: 14, fontWeight: 700, color: '#0F0F0F', marginBottom: 12, letterSpacing: 0.2,
+  },
+  cardPrice: {
+    fontFamily: "'Poppins', sans-serif", fontWeight: 800, fontSize: 48, color: '#0F0F0F',
+    lineHeight: 1, marginBottom: 10, display: 'flex', alignItems: 'baseline', gap: 6,
+  },
+  cardPricePer: { fontSize: 14, fontWeight: 500, color: '#333333' },
+  cardMonthlyNote: { fontSize: 12, color: '#555555', marginBottom: 4, marginTop: -4 },
+  cardTag: { fontSize: 13, color: '#333333', marginBottom: 20, lineHeight: '18px' },
+  features: { display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28 },
+  featureRow: { display: 'flex', alignItems: 'center', gap: 10 },
+  checkCircle: {
+    width: 20, height: 20, borderRadius: '50%', background: '#0F0F0F',
+    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+  },
+  featureText: { fontSize: 13, color: '#1a1a1a', lineHeight: '18px' },
+  ctaBtn: {
+    width: '100%', height: 48, borderRadius: 999, border: 'none',
+    background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: '#FFFFFF',
+    fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', marginTop: 'auto',
+    boxShadow: '0 4px 14px rgba(15,23,42,0.20)',
+  },
+  currentBadge: {
+    width: '100%', height: 48, borderRadius: 999, background: 'rgba(0,0,0,0.12)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontSize: 14, fontWeight: 700, color: '#0F0F0F', marginTop: 'auto',
+  },
+  freeNote: { fontSize: 12, color: '#555555', textAlign: 'center', marginTop: 'auto', lineHeight: '17px' },
+  expiryNote: { fontSize: 11.5, color: '#444444', textAlign: 'center', marginTop: 10, lineHeight: '16px' },
+  fineprint: { fontSize: 12, color: '#94A3B8', textAlign: 'center', marginTop: 36 },
 };

@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useRequestThread } from '../lib/useRequestThread';
-import { CalendarIcon, CheckIcon, ChevronLeftIcon, HeartIcon, PhoneIcon, XIcon } from '../components/icons';
+import { CalendarIcon, CheckIcon, ChevronLeftIcon, PhoneIcon, WhatsAppIcon, XIcon } from '../components/icons';
 
 const TIME_SLOTS = ['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM'];
 
@@ -50,6 +50,10 @@ export default function Chat() {
   const [scheduling, setScheduling] = useState(false);
 
   const days = nextDays(14);
+  const messagesEndRef = useRef(null);
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   async function handleSend() {
     const body = draft.trim();
@@ -133,7 +137,7 @@ export default function Chat() {
           disabled={!hasPhone}
           onClick={() => hasPhone && window.open(`https://wa.me/${detail.otherPartyPhone.replace(/[^0-9]/g, '')}`, '_blank')}
         >
-          <HeartIcon size={15} color="#FFFFFF" /> WhatsApp
+          <WhatsAppIcon size={15} color="#FFFFFF" /> WhatsApp
         </button>
         <a
           href={hasPhone ? `tel:${detail.otherPartyPhone}` : undefined}
@@ -152,6 +156,7 @@ export default function Chat() {
             ) : (
               messages.map((m) => <MessageBubble key={m.id} message={m} isMine={m.senderId === user?.id} />)
             )}
+            <div ref={messagesEndRef} />
           </div>
         ) : (
           <div style={styles.chatLockedWrap}>
@@ -172,7 +177,7 @@ export default function Chat() {
 
         {inspectionLabel && (
           <div style={styles.inspectionBanner}>
-            <CalendarIcon size={14} color="#181614" />
+            <CalendarIcon size={14} color="#0F172A" />
             <span style={styles.inspectionText}>Inspection scheduled for {inspectionLabel}</span>
           </div>
         )}
@@ -252,7 +257,7 @@ function MessageBubble({ message, isMine }) {
   return (
     <div style={{ display: 'flex', justifyContent: isMine ? 'flex-end' : 'flex-start', marginBottom: 8 }}>
       <div style={{ ...styles.bubble, ...(isMine ? styles.bubbleMine : styles.bubbleTheirs) }}>
-        <p style={{ ...styles.bubbleText, color: isMine ? '#FFFFFF' : '#181614' }}>{message.body}</p>
+        <p style={{ ...styles.bubbleText, color: isMine ? '#FFFFFF' : '#0F172A' }}>{message.body}</p>
       </div>
     </div>
   );
@@ -261,66 +266,66 @@ function MessageBubble({ message, isMine }) {
 const styles = {
   screen: { maxWidth: 720, margin: '0 auto', height: 'calc(100dvh - 64px)', display: 'flex', flexDirection: 'column' },
   centered: { alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: 12, padding: 24 },
-  errorText: { fontSize: 14, color: '#5B5750' },
-  backBtnWide: { height: 44, padding: '0 24px', borderRadius: 999, border: '1.5px solid #E6E3DB', background: '#FFFFFF', fontWeight: 600, cursor: 'pointer' },
-  header: { display: 'flex', alignItems: 'center', gap: 12, padding: '16px 24px', borderBottom: '1px solid #EFEDE6' },
+  errorText: { fontSize: 14, color: '#475569' },
+  backBtnWide: { height: 44, padding: '0 24px', borderRadius: 999, border: '1.5px solid #BFDBFE', background: '#FFFFFF', fontWeight: 600, cursor: 'pointer' },
+  header: { display: 'flex', alignItems: 'center', gap: 12, padding: '16px 24px', borderBottom: '1px solid #DBEAFE' },
   iconBtn: {
-    width: 32, height: 32, borderRadius: 999, border: '1.5px solid #E6E3DB', background: '#FFFFFF',
+    width: 32, height: 32, borderRadius: 999, border: '1.5px solid #BFDBFE', background: '#FFFFFF',
     display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0,
   },
-  headerAvatar: { width: 40, height: 40, borderRadius: 999, background: '#131110', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  headerAvatarText: { fontFamily: "'Space Grotesk', sans-serif", fontSize: 15, color: '#FFFFFF' },
+  headerAvatar: { width: 40, height: 40, borderRadius: 999, background: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  headerAvatarText: { fontFamily: "'Poppins', sans-serif", fontSize: 15, color: '#FFFFFF' },
   nameRow: { display: 'flex', alignItems: 'center', gap: 5 },
-  name: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 15, color: '#181614' },
-  status: { fontSize: 12, color: '#9B968C', marginTop: 1 },
-  quickActions: { display: 'flex', gap: 8, padding: '12px 24px', borderBottom: '1px solid #EFEDE6' },
+  name: { fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 15, color: '#0F172A' },
+  status: { fontSize: 12, color: '#94A3B8', marginTop: 1 },
+  quickActions: { display: 'flex', gap: 8, padding: '12px 24px', borderBottom: '1px solid #DBEAFE' },
   whatsapp: {
     flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, height: 38, borderRadius: 999,
     background: '#2F8F55', border: 'none', color: '#FFFFFF', fontSize: 13, fontWeight: 600, cursor: 'pointer',
   },
   call: {
     flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, height: 38, borderRadius: 999,
-    border: '1.5px solid #E6E3DB', background: '#FFFFFF', color: '#181614', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+    border: '1.5px solid #BFDBFE', background: '#FFFFFF', color: '#0F172A', fontSize: 13, fontWeight: 600, cursor: 'pointer',
   },
   disabledBtn: { opacity: 0.4, pointerEvents: 'none' },
   body: { flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, padding: '0 24px' },
   messages: { flex: 1, overflowY: 'auto', paddingTop: 16 },
-  emptyText: { fontSize: 13, color: '#9B968C', textAlign: 'center', marginTop: 40 },
+  emptyText: { fontSize: 13, color: '#94A3B8', textAlign: 'center', marginTop: 40 },
   bubble: { maxWidth: '70%', borderRadius: 18, padding: '10px 14px' },
-  bubbleMine: { background: '#131110', borderBottomRightRadius: 4 },
-  bubbleTheirs: { background: '#F0EFE9', borderBottomLeftRadius: 4 },
+  bubbleMine: { background: '#2563EB', borderBottomRightRadius: 4 },
+  bubbleTheirs: { background: '#EEF6FF', borderBottomLeftRadius: 4 },
   bubbleText: { fontSize: 14, lineHeight: '19px' },
   chatLockedWrap: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: 8, padding: '0 24px' },
-  chatLockedTitle: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 17, color: '#181614' },
-  chatLockedSub: { fontSize: 13.5, color: '#5B5750', lineHeight: '20px', maxWidth: 360 },
-  chatLockedBtn: { marginTop: 8, height: 44, padding: '0 24px', borderRadius: 999, background: '#131110', color: '#FFFFFF', border: 'none', fontWeight: 600, cursor: 'pointer' },
-  trustBanner: { background: '#131110', borderRadius: 16, padding: 14, marginTop: 12 },
+  chatLockedTitle: { fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 17, color: '#0F172A' },
+  chatLockedSub: { fontSize: 13.5, color: '#475569', lineHeight: '20px', maxWidth: 360 },
+  chatLockedBtn: { marginTop: 8, height: 44, padding: '0 24px', borderRadius: 999, background: '#0F172A', color: '#FFFFFF', border: 'none', fontWeight: 600, cursor: 'pointer' },
+  trustBanner: { background: '#0F172A', borderRadius: 16, padding: 14, marginTop: 12 },
   trustLabel: { fontSize: 10.5, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', marginBottom: 4 },
   trustText: { fontSize: 12.5, color: 'rgba(255,255,255,0.85)', lineHeight: '18px' },
-  inspectionBanner: { display: 'flex', alignItems: 'center', gap: 8, background: '#F0EFE9', borderRadius: 14, padding: '10px 14px', marginTop: 12 },
-  inspectionText: { fontSize: 12.5, fontWeight: 600, color: '#181614' },
+  inspectionBanner: { display: 'flex', alignItems: 'center', gap: 8, background: '#DBEAFE', borderRadius: 14, padding: '10px 14px', marginTop: 12 },
+  inspectionText: { fontSize: 12.5, fontWeight: 600, color: '#0F172A' },
   footer: { padding: '14px 0 20px', display: 'flex', flexDirection: 'column', gap: 10 },
   scheduleBtn: {
-    height: 46, borderRadius: 999, border: '1.5px solid #E6E3DB', background: '#FFFFFF',
-    fontSize: 13.5, fontWeight: 600, color: '#181614', cursor: 'pointer',
+    height: 46, borderRadius: 999, border: '1.5px solid #BFDBFE', background: '#FFFFFF',
+    fontSize: 13.5, fontWeight: 600, color: '#0F172A', cursor: 'pointer',
   },
   composer: { display: 'flex', gap: 8, alignItems: 'flex-end' },
   composerInput: {
-    flex: 1, minHeight: 44, maxHeight: 120, borderRadius: 18, border: '1px solid #E6E3DB', background: '#FFFFFF',
+    flex: 1, minHeight: 44, maxHeight: 120, borderRadius: 18, border: '1px solid #BFDBFE', background: '#FFFFFF',
     padding: '11px 16px', fontSize: 14, fontFamily: 'inherit', resize: 'none', outline: 'none',
   },
-  sendBtn: { height: 44, padding: '0 20px', borderRadius: 999, background: '#131110', color: '#FFFFFF', border: 'none', fontWeight: 600, cursor: 'pointer', flexShrink: 0 },
+  sendBtn: { height: 44, padding: '0 20px', borderRadius: 999, background: '#0F172A', color: '#FFFFFF', border: 'none', fontWeight: 600, cursor: 'pointer', flexShrink: 0 },
   modalBackdrop: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 1200 },
-  modalSheet: { background: '#F7F6F2', borderRadius: '24px 24px 0 0', padding: 24, width: '100%', maxWidth: 520, maxHeight: '80vh', overflowY: 'auto' },
+  modalSheet: { background: '#EEF6FF', borderRadius: '24px 24px 0 0', padding: 24, width: '100%', maxWidth: 520, maxHeight: '80vh', overflowY: 'auto' },
   modalHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 },
-  modalTitle: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 18, color: '#181614' },
-  label: { fontSize: 11, fontWeight: 600, letterSpacing: 0.6, textTransform: 'uppercase', color: '#9B968C', marginBottom: 10 },
+  modalTitle: { fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 18, color: '#0F172A' },
+  label: { fontSize: 11, fontWeight: 600, letterSpacing: 0.6, textTransform: 'uppercase', color: '#94A3B8', marginBottom: 10 },
   dayScroll: { display: 'flex', gap: 8, overflowX: 'auto', marginBottom: 20, paddingBottom: 4 },
   timeGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 },
   chip: {
-    padding: '10px 14px', borderRadius: 999, border: '1px solid #E6E3DB', background: '#FFFFFF',
-    fontSize: 12.5, fontWeight: 600, color: '#181614', cursor: 'pointer', whiteSpace: 'nowrap',
+    padding: '10px 14px', borderRadius: 999, border: '1px solid #BFDBFE', background: '#FFFFFF',
+    fontSize: 12.5, fontWeight: 600, color: '#0F172A', cursor: 'pointer', whiteSpace: 'nowrap',
   },
-  chipActive: { background: '#131110', borderColor: '#131110', color: '#FFFFFF' },
-  confirmBtn: { height: 50, borderRadius: 999, background: '#131110', color: '#FFFFFF', border: 'none', fontWeight: 700, fontSize: 14.5, cursor: 'pointer', marginTop: 24, width: '100%' },
+  chipActive: { background: '#2563EB', borderColor: '#2563EB', color: '#FFFFFF' },
+  confirmBtn: { height: 50, borderRadius: 999, background: '#0F172A', color: '#FFFFFF', border: 'none', fontWeight: 700, fontSize: 14.5, cursor: 'pointer', marginTop: 24, width: '100%' },
 };

@@ -2,6 +2,7 @@ import { Navigate, Routes, Route } from 'react-router-dom';
 import Nav from './components/Nav';
 import Hero from './components/Hero';
 import MissionBand from './components/MissionBand';
+import FeatureBand from './components/FeatureBand';
 import StickyScroll from './components/StickyScroll';
 import ListingParade from './components/ListingParade';
 import CTASection from './components/CTASection';
@@ -25,6 +26,8 @@ import EditProfile from './pages/EditProfile';
 import SavedHomes from './pages/SavedHomes';
 import RequestDetail from './pages/RequestDetail';
 import Chat from './pages/Chat';
+import Filters from './pages/Filters';
+import Notifications from './pages/Notifications';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppShell from './components/AppShell';
 
@@ -33,6 +36,7 @@ function Landing() {
     <>
       <Nav />
       <Hero />
+      <FeatureBand />
       <MissionBand />
       <StickyScroll />
       <ListingParade />
@@ -156,7 +160,6 @@ export default function App() {
           </ProtectedRoute>
         }
       />
-
       <Route
         element={
           <ProtectedRoute>
@@ -168,6 +171,8 @@ export default function App() {
         <Route path="/properties" element={<Properties />} />
         <Route path="/requests" element={<Requests />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/filters" element={<Filters />} />
+        <Route path="/notifications" element={<Notifications />} />
       </Route>
     </Routes>
   );

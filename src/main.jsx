@@ -9,6 +9,8 @@ import { BookmarksProvider } from './context/BookmarksContext'
 import { PropertiesProvider } from './context/PropertiesContext'
 import { RequestsProvider } from './context/RequestsContext'
 import { SentRequestsProvider } from './context/SentRequestsContext'
+import { FiltersProvider } from './context/FiltersContext'
+import { NotificationsProvider } from './context/NotificationsContext'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -21,7 +23,11 @@ createRoot(document.getElementById('root')).render(
               <PropertiesProvider>
                 <RequestsProvider>
                   <SentRequestsProvider>
-                    <App />
+                    <FiltersProvider>
+                      <NotificationsProvider>
+                        <App />
+                      </NotificationsProvider>
+                    </FiltersProvider>
                   </SentRequestsProvider>
                 </RequestsProvider>
               </PropertiesProvider>
