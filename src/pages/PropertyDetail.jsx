@@ -61,12 +61,10 @@ export default function PropertyDetail() {
 
   return (
     <>
-    <div style={styles.stickyBar}>
+    <div style={styles.screen}>
       <button type="button" onClick={() => navigate(-1)} style={styles.backLinkTop}>
         <ChevronLeftIcon size={14} color="#475569" /> Back
       </button>
-    </div>
-    <div style={styles.screen}>
       <div className="uleeb-detail-layout" style={styles.layout}>
         {/* Left column: photo, sticky on wide screens like any real web
             listing page (Airbnb/Zillow-style two-column detail), not a
@@ -174,17 +172,12 @@ export default function PropertyDetail() {
 }
 
 const styles = {
-  stickyBar: {
-    position: 'sticky', top: 64, zIndex: 100,
-    background: '#FFFFFF', borderBottom: '1px solid #F1F5F9',
-    padding: '10px 24px',
-  },
   screen: { maxWidth: 1000, margin: '0 auto', padding: '24px 24px 48px' },
   notFound: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: 12 },
   backLink: { background: 'none', border: 'none', color: '#0F172A', fontWeight: 600, cursor: 'pointer' },
   backLinkTop: {
     display: 'flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', color: '#475569',
-    fontSize: 13.5, fontWeight: 600, cursor: 'pointer', padding: '4px 0',
+    fontSize: 13.5, fontWeight: 600, cursor: 'pointer', padding: '4px 0', marginBottom: 16,
   },
   layout: { display: 'grid', gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 1fr)', gap: 40 },
   photoCol: { position: 'sticky', top: 88, alignSelf: 'start' },
