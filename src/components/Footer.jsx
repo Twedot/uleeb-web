@@ -31,7 +31,7 @@ export default function Footer() {
           <div style={{ minWidth: 200, maxWidth: 280 }}>
             <Logo />
             <p style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: 1.85 }}>
-              A Nigeria-first rental marketplace, built by Twedot.
+              The rental marketplace built for everyone, by Twedot.
             </p>
           </div>
 

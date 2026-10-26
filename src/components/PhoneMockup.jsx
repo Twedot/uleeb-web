@@ -52,8 +52,8 @@ function SwipeScreen() {
           Verified
         </div>
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 2, padding: '16px 16px' }}>
-          <div className="display" style={{ fontWeight: 700, fontSize: 15, color: '#fff' }}>2-bed flat, Lekki</div>
-          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 3 }}>₦2,400,000 / yr</div>
+          <div className="display" style={{ fontWeight: 700, fontSize: 15, color: '#fff' }}>2-bed flat, Lekki Phase 1</div>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 3 }}>Lagos · ₦2,400,000 / yr</div>
         </div>
       </div>
 
@@ -105,9 +105,9 @@ function ChatScreen() {
 
 function InboxScreen() {
   const rows = [
-    { name: 'Ada Bello',    sub: 'Interested · 2-bed, Lekki',  tag: 'New' },
-    { name: 'Chinedu O.',   sub: 'Accepted · Studio, Yaba',    tag: null  },
-    { name: 'Femi A.',      sub: 'Interested · 3-bed, Ikoyi',  tag: 'New' },
+    { name: 'Kwame A.',     sub: 'Interested · 2-bed, Accra',   tag: 'New' },
+    { name: 'Chinonso O.', sub: 'Accepted · Studio, Lagos',    tag: null  },
+    { name: 'Amara K.',    sub: 'Interested · 3-bed, Nairobi', tag: 'New' },
   ];
   return (
     <div style={{ padding: '52px 14px 14px', height: '100%' }}>

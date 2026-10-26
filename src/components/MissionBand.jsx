@@ -17,7 +17,7 @@ export default function MissionBand() {
           Why uleeb
         </div>
         <h2 className="display" style={{ fontSize: 'clamp(32px, 6vw, 68px)', fontWeight: 700, color: '#fff', lineHeight: 1.05, marginBottom: 26 }}>
-          Renting a home in Nigeria shouldn't mean chasing dead ads and fake agents.
+          Renting a home shouldn't mean chasing dead ads and fake agents.
         </h2>
         <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.7)', lineHeight: 1.7, maxWidth: 620, margin: '0 auto 36px' }}>
           Every listing on uleeb is tied to a real, verified landlord — and every

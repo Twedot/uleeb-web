@@ -67,7 +67,7 @@ export default function ListingParade() {
             Verified listings, every city.
           </h2>
           <p style={{ fontSize: 16, color: 'var(--text-muted)', marginTop: 12, maxWidth: 460, margin: '12px auto 0' }}>
-            From Lagos to Abuja to Port Harcourt — real landlords, real photos, real prices.
+            Any city, any country — real landlords, real photos, real prices.
           </p>
         </div>
       </div>

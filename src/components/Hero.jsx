@@ -32,7 +32,7 @@ function PropertyCard({ card, title, price, tag, style }) {
       </div>
       <div style={{ padding: '16px 20px' }}>
         <div className="display" style={{ fontWeight: 700, fontSize: 16, color: '#0F172A', marginBottom: 3 }}>{title}</div>
-        <div style={{ fontSize: 12.5, color: '#94A3B8', marginBottom: 10 }}>Lekki Phase 1, Lagos</div>
+        <div style={{ fontSize: 12.5, color: '#94A3B8', marginBottom: 10 }}>{card.area}</div>
         <div className="display" style={{ fontWeight: 700, fontSize: 17, color: '#0F172A' }}>{price}</div>
       </div>
     </div>
@@ -64,7 +64,7 @@ export default function Hero() {
           {/* ── Left: copy ── */}
           <div ref={ref} style={{ flex: '1 1 520px' }}>
             <div className={`reveal ${inView ? 'visible' : ''}`} style={{ marginBottom: 22 }}>
-              <span className="section-pill">Nigeria-first rental marketplace</span>
+              <span className="section-pill">Rent smarter. No middlemen.</span>
             </div>
             <h1 className={`display reveal delay-1 ${inView ? 'visible' : ''}`} style={{
               fontSize: 'clamp(36px, 5.5vw, 62px)', fontWeight: 700, lineHeight: 1.06,
@@ -75,7 +75,7 @@ export default function Hero() {
             <p className={`reveal delay-2 ${inView ? 'visible' : ''}`} style={{
               fontSize: 17.5, color: 'var(--text-muted)', lineHeight: 1.75, maxWidth: 480, marginBottom: 38,
             }}>
-              uleeb matches tenants with verified rentals across Nigeria — swipe to discover,
+              uleeb matches tenants with verified rentals near you — swipe to discover,
               chat directly with landlords once accepted, and schedule inspections without
               ever going through a middleman.
             </p>
@@ -98,15 +98,15 @@ export default function Hero() {
 
           {/* ── Right: card stack ── */}
           <div className="hero-visual" style={{ flex: '1 1 420px', position: 'relative', height: 440, minWidth: 320 }}>
-            {/* Back card */}
+            {/* Back card — Accra */}
             <PropertyCard
               card={HERO_CARDS[1]}
-              title="3-bed duplex, Ikoyi"
-              price="₦5,100,000 / yr"
+              title="3-bed apartment, Accra"
+              price="GH₵ 36,000 / yr"
               tag="New"
               style={{ right: 0, top: 10, transform: 'rotate(4deg)', zIndex: 1, opacity: 0.88, animation: 'floatCard2 7s ease-in-out infinite' }}
             />
-            {/* Front card */}
+            {/* Front card — Lagos */}
             <PropertyCard
               card={HERO_CARDS[0]}
               title="2-bed flat, Lekki"
