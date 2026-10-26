@@ -15,23 +15,72 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>uleeb — Verified rentals, swipe by swipe</title>
-    <meta name="description" content="uleeb is a Nigeria-first rental marketplace — swipe to discover verified homes, chat directly with landlords, and schedule inspections without the middleman." />
-    <meta name="keywords" content="uleeb, rentals Nigeria, apartment finder, verified listings, landlord tenant app, house hunting Nigeria" />
+    <meta name="description" content="uleeb is a rental marketplace for the world — swipe to discover verified homes, chat directly with landlords, and schedule inspections without the middleman." />
+    <meta name="keywords" content="uleeb, verified rentals, apartment finder, house hunting app, landlord tenant marketplace, rental listings, swipe to rent" />
     <meta name="robots" content="index, follow" />
     <meta name="author" content="Twedot" />
+    <meta name="theme-color" content="#0F172A" />
+    <link rel="canonical" href="https://uleeb.twedot.com" />
+    <link rel="manifest" href="/manifest.json" />
 
     <!-- Open Graph -->
+    <meta property="og:site_name" content="uleeb" />
     <meta property="og:title" content="uleeb — Verified rentals, swipe by swipe" />
-    <meta property="og:description" content="Swipe to discover verified rentals, chat directly with landlords, and schedule inspections — no middleman." />
+    <meta property="og:description" content="Swipe to discover verified rentals anywhere in the world. Chat directly with landlords, no middlemen." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image" content="https://uleeb.twedot.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:url" content="https://uleeb.twedot.com" />
+    <meta property="og:locale" content="en_US" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@twedot" />
     <meta name="twitter:title" content="uleeb — Verified rentals, swipe by swipe" />
-    <meta name="twitter:description" content="Swipe to discover verified rentals, chat directly with landlords, and schedule inspections — no middleman." />
-    <meta name="twitter:image" content="/og-image.png" />
+    <meta name="twitter:description" content="Swipe to discover verified rentals anywhere in the world. Chat directly with landlords, no middlemen." />
+    <meta name="twitter:image" content="https://uleeb.twedot.com/og-image.png" />
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://uleeb.twedot.com/#website",
+          "url": "https://uleeb.twedot.com",
+          "name": "uleeb",
+          "description": "Verified rental marketplace — discover homes, chat with landlords, no middlemen.",
+          "publisher": { "@id": "https://uleeb.twedot.com/#organization" }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://uleeb.twedot.com/#organization",
+          "name": "uleeb",
+          "url": "https://uleeb.twedot.com",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://uleeb.twedot.com/logo.png"
+          },
+          "parentOrganization": {
+            "@type": "Organization",
+            "name": "Twedot",
+            "url": "https://twedot.com"
+          }
+        },
+        {
+          "@type": "WebPage",
+          "@id": "https://uleeb.twedot.com/#webpage",
+          "url": "https://uleeb.twedot.com",
+          "name": "uleeb — Verified rentals, swipe by swipe",
+          "isPartOf": { "@id": "https://uleeb.twedot.com/#website" },
+          "about": { "@id": "https://uleeb.twedot.com/#organization" },
+          "description": "uleeb is a rental marketplace for the world — swipe to discover verified homes, chat directly with landlords, and schedule inspections without the middleman."
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Disallow: /discover
+Disallow: /properties
+Disallow: /requests
+Disallow: /profile
+Disallow: /plans
+Disallow: /edit-profile
+Disallow: /add-property
+Disallow: /my-properties
+Disallow: /saved-homes
+Disallow: /chat
+Disallow: /notifications
+Disallow: /filters
+
+Sitemap: https://uleeb.twedot.com/sitemap.xml
