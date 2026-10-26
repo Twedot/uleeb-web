@@ -57,7 +57,8 @@ export default function EditProperty() {
     location.trim().length > 2 &&
     !!state &&
     price.length > 0 &&
-    totalPhotos >= MIN_PHOTOS;
+    totalPhotos >= MIN_PHOTOS &&
+    (!!video || !!original?.videoUrl);
 
   function toggleAmenity(a) {
     setAmenities((prev) => (prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a]));
@@ -207,7 +208,7 @@ export default function EditProperty() {
           <p style={styles.hint}>{totalPhotos} of {MIN_PHOTOS} minimum photos.</p>
         </Field>
 
-        <Field label="Walkthrough video (optional)">
+        <Field label="Walkthrough video">
           {video ? (
             <div style={styles.fileRow}>
               <FileIcon size={16} color="#475569" />
