@@ -24,9 +24,9 @@ export default function CTASection() {
             uleeb is live — try it today.
           </h2>
           <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, marginBottom: 32, maxWidth: 420 }}>
-            Verified rentals, real landlords, no middleman. Sign up with your
-            phone number and start browsing homes near you — right in your
-            browser, no app download needed yet.
+            Verified rentals, real landlords, real conversations. Sign up with
+            your phone number and start browsing homes near you — right in your
+            browser, no app download needed.
           </p>
 
           <Link to="/login" className="btn-hero-white" style={{ display: 'inline-flex', textDecoration: 'none', padding: '16px 36px', borderRadius: 999 }}>

@@ -4,6 +4,10 @@ const LINKS = [
     { label: 'Listings', href: '#features' },
     { label: 'Get started', href: '/login' },
   ]},
+  { title: 'Legal', items: [
+    { label: 'Terms of Service', href: '/terms' },
+    { label: 'Privacy Policy', href: '/privacy' },
+  ]},
   { title: 'Company', items: [
     { label: 'Powered by Twedot', href: 'https://twedot.com', external: true },
     { label: 'Contact', href: 'mailto:hello@uleeb.com' },

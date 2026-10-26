@@ -31,6 +31,8 @@ import Notifications from './pages/Notifications';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppShell from './components/AppShell';
 import NotFound from './pages/NotFound';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 
 function Landing() {
   return (
@@ -175,6 +177,8 @@ export default function App() {
         <Route path="/filters" element={<Filters />} />
         <Route path="/notifications" element={<Notifications />} />
       </Route>
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/privacy" element={<Privacy />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

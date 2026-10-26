@@ -22,7 +22,7 @@ export default function MissionBand() {
         <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.7)', lineHeight: 1.7, maxWidth: 620, margin: '0 auto 36px' }}>
           Every listing on uleeb is tied to a real, verified landlord — and every
           conversation only starts once they've actually accepted your interest.
-          No middlemen, no guesswork.
+          Transparent, fast, and fair.
         </p>
         <a
           href="#how-it-works"

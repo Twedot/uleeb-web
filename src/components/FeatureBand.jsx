@@ -10,10 +10,10 @@ const FEATURES = [
   },
   {
     accent: '#C8F23E',      // lime
-    icon: '🔒',
-    tag: 'Zero middlemen',
-    title: 'Landlords only, no agents',
-    desc: 'Talk directly with whoever owns the property. No commission fees, no third-party delays — just you and the landlord.',
+    icon: '💬',
+    tag: 'Direct connect',
+    title: 'Talk directly to the owner',
+    desc: 'Chat with landlords and agents in-app once your interest is accepted. Get answers fast and arrange viewings without the back-and-forth.',
   },
   {
     accent: '#F5CC38',      // yellow

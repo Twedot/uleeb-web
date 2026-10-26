@@ -64,7 +64,7 @@ export default function Hero() {
           {/* ── Left: copy ── */}
           <div ref={ref} style={{ flex: '1 1 520px' }}>
             <div className={`reveal ${inView ? 'visible' : ''}`} style={{ marginBottom: 22 }}>
-              <span className="section-pill">Rent smarter. No middlemen.</span>
+              <span className="section-pill">Find verified homes near you.</span>
             </div>
             <h1 className={`display reveal delay-1 ${inView ? 'visible' : ''}`} style={{
               fontSize: 'clamp(36px, 5.5vw, 62px)', fontWeight: 700, lineHeight: 1.06,
@@ -76,8 +76,8 @@ export default function Hero() {
               fontSize: 17.5, color: 'var(--text-muted)', lineHeight: 1.75, maxWidth: 480, marginBottom: 38,
             }}>
               uleeb matches tenants with verified rentals near you — swipe to discover,
-              chat directly with landlords once accepted, and schedule inspections without
-              ever going through a middleman.
+              chat directly with landlords or agents once accepted, and schedule inspections
+              all in one place.
             </p>
             <div className={`reveal delay-3 ${inView ? 'visible' : ''}`} style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
               <Link to="/login" className="btn-hero-black">Get started free</Link>
@@ -88,7 +88,7 @@ export default function Hero() {
             <div className={`reveal delay-3 ${inView ? 'visible' : ''}`} style={{
               display: 'flex', alignItems: 'center', gap: 20, marginTop: 32, flexWrap: 'wrap',
             }}>
-              {[['🏠', 'Verified listings'], ['🔒', 'No middlemen'], ['⚡', 'Free to browse']].map(([icon, label]) => (
+              {[['🏠', 'Verified listings'], ['🔒', 'Verified landlords'], ['⚡', 'Free to browse']].map(([icon, label]) => (
                 <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#475569', fontWeight: 600 }}>
                   <span>{icon}</span><span>{label}</span>
                 </div>

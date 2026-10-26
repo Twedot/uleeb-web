@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth, postAuthRoute } from '../context/AuthContext';
 import { PhoneInput, isPhoneInputValid, phoneInputToE164 } from '../components/PhoneInput';
 import { ChevronLeftIcon } from '../components/icons';
@@ -17,6 +17,7 @@ export default function LoginPhone() {
   const [code, setCode] = useState('');
   const [error, setError] = useState(null);
   const [cooldown, setCooldown] = useState(RESEND_COOLDOWN);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const step = pendingPhone ? 'code' : 'phone';
   const phoneValid = isPhoneInputValid(phone);
@@ -88,6 +89,21 @@ export default function LoginPhone() {
             <PhoneInput value={phone} onChangeValue={(v) => { setPhone(v); setError(null); }} autoFocus />
           </div>
           {error && <p className="auth-error">{error}</p>}
+
+          <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer', marginTop: 8 }}>
+            <input
+              type="checkbox"
+              checked={termsAccepted}
+              onChange={(e) => setTermsAccepted(e.target.checked)}
+              style={{ marginTop: 3, width: 16, height: 16, accentColor: '#0F172A', flexShrink: 0, cursor: 'pointer' }}
+            />
+            <span style={{ fontSize: 13, color: '#475569', lineHeight: 1.6 }}>
+              I agree to uleeb's{' '}
+              <Link to="/terms" target="_blank" rel="noopener noreferrer" style={{ color: '#0F172A', fontWeight: 700, textDecoration: 'underline' }}>Terms of Service</Link>
+              {' '}and{' '}
+              <Link to="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#0F172A', fontWeight: 700, textDecoration: 'underline' }}>Privacy Policy</Link>
+            </span>
+          </label>
         </div>
       ) : (
         <div className="auth-body" style={{ justifyContent: 'flex-start', paddingTop: 40 }}>
@@ -124,12 +140,12 @@ export default function LoginPhone() {
         {step === 'phone' ? (
           <button
             onClick={handleSendCode}
-            disabled={!phoneValid || isSigningIn}
+            disabled={!phoneValid || !termsAccepted || isSigningIn}
             style={{
               height: 54, borderRadius: 999,
               background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: '#fff', border: 'none',
-              fontSize: 15, fontWeight: 600, cursor: (!phoneValid || isSigningIn) ? 'default' : 'pointer',
-              opacity: (!phoneValid || isSigningIn) ? 0.4 : 1,
+              fontSize: 15, fontWeight: 600, cursor: (!phoneValid || !termsAccepted || isSigningIn) ? 'default' : 'pointer',
+              opacity: (!phoneValid || !termsAccepted || isSigningIn) ? 0.4 : 1,
               boxShadow: '0 4px 16px rgba(15,23,42,0.20)',
             }}
           >
