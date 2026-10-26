@@ -157,6 +157,7 @@ img { max-width: 100%; display: block; }
 @media (max-width: 720px) {
   .app-nav-label { display: none !important; }
   .app-nav-link { padding: 10px !important; }
+  .wallet-chip { display: none !important; }
   .uleeb-detail-layout { grid-template-columns: 1fr !important; gap: 24px !important; }
   .uleeb-detail-photo-col { position: static !important; }
 }

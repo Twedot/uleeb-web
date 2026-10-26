@@ -1,4 +1,4 @@
-import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useRequests } from '../context/RequestsContext';
 import { useSentRequests } from '../context/SentRequestsContext';
@@ -20,13 +20,11 @@ const TABS = [
 
 export default function AppShell() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const role = user?.role ?? 'tenant';
   const visibleTabs = TABS.filter((t) => t.roles.includes(role));
   const firstName = user?.name?.split(' ')[0] ?? 'You';
   const initials = firstName.charAt(0).toUpperCase();
   const walletNaira = Math.floor((user?.walletKobo ?? 0) / 100);
-
   // A badge on the Requests tab for whatever needs this account's
   // attention: a landlord hasn't reviewed yet ('new' applicants), a
   // tenant has something outstanding worth checking — a request still
@@ -68,15 +66,10 @@ export default function AppShell() {
           </div>
 
           <div style={styles.rightGroup}>
-            <button
-              type="button"
-              style={styles.walletChip}
-              onClick={() => navigate('/profile')}
-              aria-label="Wallet balance"
-            >
+            <div className="wallet-chip" style={styles.walletChip}>
               <span style={{ fontSize: 13 }}>💰</span>
               <span style={styles.walletChipText}>₦{walletNaira.toLocaleString()}</span>
-            </button>
+            </div>
             <Link to="/notifications" style={styles.bellBtn} aria-label="Notifications">
               <BellIcon size={17} color="#475569" />
               {notifUnread > 0 && (
