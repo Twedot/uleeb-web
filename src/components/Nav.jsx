@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth, postAuthRoute } from '../context/AuthContext';
 
 const NAV_LINKS = [
   { label: 'How it works', href: '#how-it-works' },
@@ -26,6 +27,8 @@ function Logo() {
 // for yet), plus a "Powered by Twedot" backlink since this site links
 // back the other way from Twedot's own.
 export default function Nav() {
+  const { user } = useAuth();
+  const appRoute = user ? postAuthRoute(user) : null;
   const [hidden, setHidden] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -72,8 +75,14 @@ export default function Nav() {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <Link to="/login" className="nav-link nav-links" style={{ textDecoration: 'none' }}>Log in</Link>
-        <Link to="/login" className="btn-primary" style={{ textDecoration: 'none' }}>Sign up</Link>
+        {user ? (
+          <Link to={appRoute} className="btn-primary" style={{ textDecoration: 'none' }}>Open app</Link>
+        ) : (
+          <>
+            <Link to="/login" className="nav-link nav-links" style={{ textDecoration: 'none' }}>Log in</Link>
+            <Link to="/login" className="btn-primary" style={{ textDecoration: 'none' }}>Sign up</Link>
+          </>
+        )}
 
         <div ref={menuRef} style={{ position: 'relative' }} className="nav-links">
           <button
