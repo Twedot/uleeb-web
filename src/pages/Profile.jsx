@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, isRoleVerified } from '../context/AuthContext';
 import { useProperties } from '../context/PropertiesContext';
@@ -19,6 +20,8 @@ export default function Profile() {
   const isLandlord = user.role === 'landlord';
   const planLabel = (user.plan ?? 'free').toUpperCase();
   const verified = isRoleVerified(user, user.role ?? 'tenant');
+  const walletNaira = Math.floor((user.walletKobo ?? 0) / 100);
+  const [walletPopup, setWalletPopup] = useState(false);
 
   async function handleSignOut() {
     await signOut();
@@ -71,6 +74,33 @@ export default function Profile() {
           <p style={styles.leaseLabel}>Current lease</p>
           <p style={styles.leaseTitle}>None yet</p>
           <p style={styles.leaseSub}>Swipe on a home to get started.</p>
+        </div>
+      )}
+
+      <button
+        type="button"
+        style={styles.walletCard}
+        onClick={() => { if (!isLandlord) setWalletPopup(true); }}
+      >
+        <div style={{ textAlign: 'left' }}>
+          <p style={{ ...styles.leaseLabel, color: 'rgba(255,255,255,0.55)' }}>Wallet</p>
+          <p style={styles.walletAmount}>₦{walletNaira.toLocaleString()}</p>
+          {isLandlord && (
+            <p style={{ ...styles.leaseSub, color: 'rgba(255,255,255,0.6)' }}>+₦200 per property listed · ends Dec 25</p>
+          )}
+        </div>
+        <span style={{ fontSize: 22 }}>💰</span>
+      </button>
+
+      {walletPopup && (
+        <div style={styles.overlay} onClick={() => setWalletPopup(false)}>
+          <div style={styles.popupCard} onClick={(e) => e.stopPropagation()}>
+            <p style={styles.popupTitle}>Landlords & agents only</p>
+            <p style={styles.popupBody}>
+              The Uleeb wallet is only available to landlords and agents. Earn ₦200 for every property you list. This promotion ends 25th December.
+            </p>
+            <button type="button" style={styles.popupBtn} onClick={() => setWalletPopup(false)}>Got it</button>
+          </div>
         </div>
       )}
 
@@ -127,6 +157,27 @@ const styles = {
   leaseLabel: { fontSize: 11, fontWeight: 600, letterSpacing: 0.6, textTransform: 'uppercase', color: '#94A3B8', marginBottom: 6 },
   leaseTitle: { fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 17, color: '#0F172A', marginBottom: 4 },
   leaseSub: { fontSize: 13, color: '#475569' },
+  walletCard: {
+    background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', border: 'none', borderRadius: 28,
+    padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', width: '100%',
+    boxShadow: '0 4px 16px rgba(15,23,42,0.18)',
+  },
+  walletAmount: { fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 22, color: '#FFFFFF', marginBottom: 4 },
+  overlay: {
+    position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.55)', display: 'flex',
+    alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: '0 24px',
+  },
+  popupCard: {
+    background: '#FFFFFF', borderRadius: 28, padding: '28px 24px', maxWidth: 360, width: '100%',
+    boxShadow: '0 20px 60px rgba(15,23,42,0.25)',
+  },
+  popupTitle: { fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 17, color: '#0F172A', marginBottom: 10 },
+  popupBody: { fontSize: 13.5, color: '#475569', lineHeight: 1.65, marginBottom: 20 },
+  popupBtn: {
+    width: '100%', height: 50, borderRadius: 999, border: 'none',
+    background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: '#FFFFFF',
+    fontSize: 14.5, fontWeight: 600, cursor: 'pointer',
+  },
   menu: { display: 'flex', flexDirection: 'column', gap: 12 },
   menuRow: {
     background: '#FFFFFF', border: '1px solid #DBEAFE', borderRadius: 16, padding: 16,
