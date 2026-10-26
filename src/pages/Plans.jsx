@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ChevronLeftIcon, CheckIcon } from '../components/icons';
 
-const PRICE_NAIRA = { plus: 3500, pro: 4300 };
+const PRICE_NAIRA = { plus: 2500, pro: 3300 };
 
 const BILLING_OPTIONS = [
   { label: '1 month', months: 1 },
