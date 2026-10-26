@@ -1,4 +1,4 @@
-import { NavLink, Outlet, Link } from 'react-router-dom';
+import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useRequests } from '../context/RequestsContext';
 import { useSentRequests } from '../context/SentRequestsContext';
@@ -20,10 +20,12 @@ const TABS = [
 
 export default function AppShell() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const role = user?.role ?? 'tenant';
   const visibleTabs = TABS.filter((t) => t.roles.includes(role));
   const firstName = user?.name?.split(' ')[0] ?? 'You';
   const initials = firstName.charAt(0).toUpperCase();
+  const walletNaira = Math.floor((user?.walletKobo ?? 0) / 100);
 
   // A badge on the Requests tab for whatever needs this account's
   // attention: a landlord hasn't reviewed yet ('new' applicants), a
@@ -66,6 +68,15 @@ export default function AppShell() {
           </div>
 
           <div style={styles.rightGroup}>
+            <button
+              type="button"
+              style={styles.walletChip}
+              onClick={() => navigate('/profile')}
+              aria-label="Wallet balance"
+            >
+              <span style={{ fontSize: 13 }}>💰</span>
+              <span style={styles.walletChipText}>₦{walletNaira.toLocaleString()}</span>
+            </button>
             <Link to="/notifications" style={styles.bellBtn} aria-label="Notifications">
               <BellIcon size={17} color="#475569" />
               {notifUnread > 0 && (
@@ -109,6 +120,12 @@ const styles = {
     background: '#2563EB', color: '#FFFFFF', fontSize: 9.5, fontWeight: 700, lineHeight: '15px', textAlign: 'center',
   },
   rightGroup: { display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 },
+  walletChip: {
+    display: 'flex', alignItems: 'center', gap: 5, height: 34, padding: '0 12px', borderRadius: 999,
+    background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', border: 'none', cursor: 'pointer',
+    flexShrink: 0,
+  },
+  walletChipText: { fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 13, color: '#FFFFFF' },
   bellBtn: {
     position: 'relative', width: 34, height: 34, borderRadius: 999,
     border: '1.5px solid #BFDBFE', background: '#FFFFFF', flexShrink: 0,
