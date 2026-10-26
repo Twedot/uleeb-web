@@ -59,6 +59,8 @@ export function PropertiesProvider({ children }) {
         bathrooms: input.bathrooms,
         sizeSqm: input.sizeSqm,
         amenities: input.amenities,
+        agencyFee: input.agencyFee ?? null,
+        extraCharges: input.extraCharges ?? [],
       },
       token,
     );

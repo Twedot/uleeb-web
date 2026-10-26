@@ -119,6 +119,34 @@ export default function PropertyDetail() {
             <span style={styles.priceUnit}> / year</span>
           </div>
 
+          {(item.agencyFee != null || (item.extraCharges ?? []).length > 0) && (
+            <div style={styles.costCard}>
+              <p style={{ ...styles.label, marginTop: 0, marginBottom: 12 }}>Cost breakdown</p>
+              <div style={styles.costRow}>
+                <span style={styles.costLabel}>Annual rent</span>
+                <span style={styles.costVal}>₦{Number(item.price ?? 0).toLocaleString()}</span>
+              </div>
+              {item.agencyFee != null && (
+                <div style={styles.costRow}>
+                  <span style={styles.costLabel}>Agency fee</span>
+                  <span style={styles.costVal}>{item.agencyFee === 0 ? 'Waived' : `₦${Number(item.agencyFee).toLocaleString()}`}</span>
+                </div>
+              )}
+              {(item.extraCharges ?? []).map((c, i) => (
+                <div key={i} style={styles.costRow}>
+                  <span style={styles.costLabel}>{c.name}</span>
+                  <span style={styles.costVal}>₦{Number(c.amount).toLocaleString()}</span>
+                </div>
+              ))}
+              <div style={{ ...styles.costRow, borderTop: '1px solid #DBEAFE', marginTop: 8, paddingTop: 10 }}>
+                <span style={{ ...styles.costLabel, fontWeight: 700, color: '#0F172A' }}>Total move-in</span>
+                <span style={{ ...styles.costVal, fontWeight: 700, color: '#0F172A' }}>
+                  ₦{(Number(item.price ?? 0) + Number(item.agencyFee ?? 0) + (item.extraCharges ?? []).reduce((s, c) => s + Number(c.amount ?? 0), 0)).toLocaleString()}
+                </span>
+              </div>
+            </div>
+          )}
+
           {user?.role !== 'landlord' && (
             <div style={styles.actions}>
               <button type="button" style={styles.saveBtn} onClick={handleBookmark}>
@@ -195,6 +223,10 @@ const styles = {
   price: { fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 28, color: '#0F172A' },
   priceUnit: { fontSize: 13.5, color: '#94A3B8' },
   label: { fontSize: 11, fontWeight: 600, letterSpacing: 0.8, textTransform: 'uppercase', color: '#94A3B8', marginTop: 24, marginBottom: 10 },
+  costCard: { background: '#F8FAFF', border: '1px solid #DBEAFE', borderRadius: 20, padding: '16px 18px', marginBottom: 4 },
+  costRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 8, marginBottom: 0 },
+  costLabel: { fontSize: 13.5, color: '#475569' },
+  costVal: { fontSize: 13.5, color: '#0F172A', fontWeight: 600 },
   amenitiesWrap: { display: 'flex', flexWrap: 'wrap', gap: 10 },
   amenity: {
     display: 'flex', alignItems: 'center', gap: 8, background: '#FFFFFF',

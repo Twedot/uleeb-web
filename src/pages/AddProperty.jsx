@@ -32,6 +32,9 @@ export default function AddProperty() {
   const [bedrooms, setBedrooms] = useState('');
   const [size, setSize] = useState('');
   const [amenities, setAmenities] = useState([]);
+  const [agencyFeeOn, setAgencyFeeOn] = useState(false);
+  const [agencyFee, setAgencyFee] = useState('');
+  const [extraCharges, setExtraCharges] = useState([]);
   const [photos, setPhotos] = useState([]);
   const [video, setVideo] = useState(null);
   const [document, setDocument] = useState(null);
@@ -47,6 +50,10 @@ export default function AddProperty() {
     price.length > 0 &&
     photos.length >= MIN_PHOTOS &&
     !!video;
+
+  function addCharge() { setExtraCharges((p) => [...p, { name: '', amount: '' }]); }
+  function updateCharge(i, field, val) { setExtraCharges((p) => p.map((c, idx) => idx === i ? { ...c, [field]: val } : c)); }
+  function removeCharge(i) { setExtraCharges((p) => p.filter((_, idx) => idx !== i)); }
 
   function toggleAmenity(a) {
     setAmenities((prev) => (prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a]));
@@ -76,6 +83,8 @@ export default function AddProperty() {
         bedrooms: Number(bedrooms) || 0,
         sizeSqm: Number(size) || 0,
         amenities,
+        agencyFee: agencyFeeOn ? (Number(agencyFee) || 0) : null,
+        extraCharges: extraCharges.filter((c) => c.name.trim()).map((c) => ({ name: c.name.trim(), amount: Number(c.amount) || 0 })),
         photos,
         video,
         document,
@@ -160,6 +169,34 @@ export default function AddProperty() {
               </button>
             ))}
           </div>
+        </Field>
+
+        <Field label="Agency fee">
+          <div style={styles.toggleRow}>
+            <span style={{ fontSize: 14, color: '#475569', fontWeight: 500 }}>Agency fee applies</span>
+            <button type="button" style={{ ...styles.toggle, ...(agencyFeeOn ? styles.toggleOn : null) }} onClick={() => setAgencyFeeOn((p) => !p)} aria-pressed={agencyFeeOn}>
+              <span style={{ ...styles.toggleThumb, ...(agencyFeeOn ? styles.toggleThumbOn : null) }} />
+            </button>
+          </div>
+          {agencyFeeOn && (
+            <input style={{ ...styles.input, marginTop: 10 }} value={agencyFee} onChange={(e) => setAgencyFee(e.target.value.replace(/[^0-9]/g, ''))} inputMode="numeric" placeholder="Agency fee in ₦ (e.g. 150000)" />
+          )}
+        </Field>
+
+        <Field label="Other charges">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {extraCharges.map((c, i) => (
+              <div key={i} style={styles.chargeRow}>
+                <input style={{ ...styles.input, flex: 1, height: 44 }} value={c.name} onChange={(e) => updateCharge(i, 'name', e.target.value)} placeholder="e.g. Security deposit" />
+                <input style={{ ...styles.input, width: 110, height: 44 }} value={c.amount} onChange={(e) => updateCharge(i, 'amount', e.target.value.replace(/[^0-9]/g, ''))} inputMode="numeric" placeholder="₦ amount" />
+                <button type="button" style={styles.removeCharge} onClick={() => removeCharge(i)} aria-label="Remove">
+                  <XIcon size={13} color="#475569" />
+                </button>
+              </div>
+            ))}
+            <button type="button" style={styles.addChargeBtn} onClick={addCharge}>+ Add charge</button>
+          </div>
+          <p style={styles.hint}>Security deposit, service charge, electricity fee, etc.</p>
         </Field>
 
         <Field label={`Photos (min. ${MIN_PHOTOS})`}>
@@ -273,6 +310,14 @@ const styles = {
     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
   },
   hint: { fontSize: 11.5, color: '#94A3B8', marginTop: 8 },
+  toggleRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 50, border: '1px solid #BFDBFE', borderRadius: 16, padding: '0 16px', background: '#FFFFFF' },
+  toggle: { width: 44, height: 24, borderRadius: 999, background: '#CBD5E1', border: 'none', cursor: 'pointer', position: 'relative', flexShrink: 0, transition: 'background 0.2s' },
+  toggleOn: { background: '#2563EB' },
+  toggleThumb: { position: 'absolute', top: 3, left: 3, width: 18, height: 18, borderRadius: 999, background: '#FFFFFF', transition: 'left 0.2s', display: 'block' },
+  toggleThumbOn: { left: 23 },
+  chargeRow: { display: 'flex', gap: 8, alignItems: 'center' },
+  removeCharge: { background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', flexShrink: 0 },
+  addChargeBtn: { alignSelf: 'flex-start', background: 'none', border: '1px dashed #BFDBFE', borderRadius: 999, padding: '8px 16px', fontSize: 13, fontWeight: 600, color: '#2563EB', cursor: 'pointer' },
   uploadRow: {
     display: 'flex', alignItems: 'center', gap: 10, height: 50, borderRadius: 16,
     border: '1px dashed #BFDBFE', background: '#EEF6FF', padding: '0 16px', cursor: 'pointer',
