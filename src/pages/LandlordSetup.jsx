@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, postAuthRoute } from '../context/AuthContext';
 import { PhoneInput, isPhoneInputValid, phoneInputToE164 } from '../components/PhoneInput';
@@ -9,6 +9,11 @@ import '../styles/auth.css';
 const LANDLORD_TYPES = ['Individual landlord', 'Property agent', 'Property management company'];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const LANDLORD_SETUP_KEY = 'uleeb:landlord_setup';
+function readLandlordSaved() {
+  try { return JSON.parse(sessionStorage.getItem(LANDLORD_SETUP_KEY) || '{}'); } catch { return {}; }
+}
+
 // Mirrors uleeb mobile's app/landlord-setup.tsx.
 export default function LandlordSetup() {
   const { user, updateProfile } = useAuth();
@@ -16,15 +21,20 @@ export default function LandlordSetup() {
 
   const STEPS = ['name', ...(user?.phone ? [] : ['phone']), ...(user?.email ? [] : ['email']), 'occupation'];
 
-  const [step, setStep] = useState(0);
-  const [name, setName] = useState(user?.name && user.name !== 'You' ? user.name : '');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
+  const saved = useRef(readLandlordSaved());
+  const [step, setStep] = useState(saved.current.step ?? 0);
+  const [name, setName] = useState(saved.current.name ?? (user?.name && user.name !== 'You' ? user.name : ''));
+  const [phone, setPhone] = useState(saved.current.phone ?? '');
+  const [email, setEmail] = useState(saved.current.email ?? '');
   const [emailTaken, setEmailTaken] = useState(false);
   const [emailChecking, setEmailChecking] = useState(false);
-  const [landlordType, setLandlordType] = useState(user?.landlordType ?? null);
+  const [landlordType, setLandlordType] = useState(saved.current.landlordType ?? user?.landlordType ?? null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    try { sessionStorage.setItem(LANDLORD_SETUP_KEY, JSON.stringify({ step, name, phone, email, landlordType })); } catch {}
+  }, [step, name, phone, email, landlordType]);
 
   const currentStep = STEPS[step];
   const canContinue =
@@ -32,6 +42,11 @@ export default function LandlordSetup() {
     (currentStep === 'phone' && isPhoneInputValid(phone)) ||
     (currentStep === 'email' && EMAIL_RE.test(email.trim()) && !emailTaken && !emailChecking) ||
     (currentStep === 'occupation' && !!landlordType);
+
+  function skipPhone() {
+    setPhone('');
+    setStep(step + 1);
+  }
 
   const firstName = (name.trim().split(' ')[0] || user?.name?.split(' ')[0]) ?? 'You';
   const initials = firstName.charAt(0).toUpperCase();
@@ -68,15 +83,17 @@ export default function LandlordSetup() {
         email: !user?.email ? email.trim() || undefined : undefined,
         landlordType: landlordType ?? undefined,
       });
+      try { sessionStorage.removeItem(LANDLORD_SETUP_KEY); } catch {}
       navigate(postAuthRoute(user), { replace: true });
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Please try again.';
       if (msg.toLowerCase().includes('email')) {
         const emailStep = STEPS.indexOf('email');
-        if (emailStep !== -1) {
-          setStep(emailStep);
-          setEmailTaken(true);
-        }
+        if (emailStep !== -1) { setStep(emailStep); setEmailTaken(true); }
+      } else if (msg.toLowerCase().includes('phone')) {
+        const phoneStep = STEPS.indexOf('phone');
+        if (phoneStep !== -1) { setStep(phoneStep); setError(msg); }
+        else setError(msg);
       } else {
         setError(msg);
       }
@@ -134,6 +151,13 @@ export default function LandlordSetup() {
             <h2 className="onb-q-title">What's your phone number?</h2>
             <p className="onb-q-sub">Lets a tenant reach you by WhatsApp or call once you accept their request.</p>
             <PhoneInput value={phone} onChangeValue={setPhone} autoFocus />
+            <button
+              type="button"
+              onClick={skipPhone}
+              style={{ marginTop: 12, background: 'none', border: 'none', color: '#94A3B8', fontSize: 13, cursor: 'pointer', padding: 0 }}
+            >
+              Skip for now
+            </button>
           </>
         )}
 

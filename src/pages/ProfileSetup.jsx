@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, postAuthRoute } from '../context/AuthContext';
 import { PhoneInput, isPhoneInputValid, phoneInputToE164 } from '../components/PhoneInput';
@@ -13,6 +13,11 @@ import '../styles/auth.css';
 const OCCUPATIONS = ['Employed', 'Self-employed', 'Student', 'Remote worker'];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const PROFILE_SETUP_KEY = 'uleeb:profile_setup';
+function readProfileSaved() {
+  try { return JSON.parse(sessionStorage.getItem(PROFILE_SETUP_KEY) || '{}'); } catch { return {}; }
+}
+
 // Mirrors uleeb mobile's app/profile-setup.tsx — same step sequence
 // (name -> phone/email if missing -> occupation -> budget -> state),
 // same "only ask for whichever contact info you don't already have"
@@ -24,21 +29,26 @@ export default function ProfileSetup() {
 
   const STEPS = ['name', ...(user?.phone ? [] : ['phone']), ...(user?.email ? [] : ['email']), 'occupation', 'budget', 'state'];
 
-  const [step, setStep] = useState(0);
-  const [name, setName] = useState(user?.name && user.name !== 'You' ? user.name : '');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
+  const saved = useRef(readProfileSaved());
+  const [step, setStep] = useState(saved.current.step ?? 0);
+  const [name, setName] = useState(saved.current.name ?? (user?.name && user.name !== 'You' ? user.name : ''));
+  const [phone, setPhone] = useState(saved.current.phone ?? '');
+  const [email, setEmail] = useState(saved.current.email ?? '');
   const [emailTaken, setEmailTaken] = useState(false);
   const [emailChecking, setEmailChecking] = useState(false);
-  const [occupation, setOccupation] = useState(null);
-  const [budget, setBudget] = useState('2400000');
-  const [period, setPeriod] = useState('year');
-  const [state, setState] = useState(null);
-  const [locationAddress, setLocationAddress] = useState('');
+  const [occupation, setOccupation] = useState(saved.current.occupation ?? null);
+  const [budget, setBudget] = useState(saved.current.budget ?? '2400000');
+  const [period, setPeriod] = useState(saved.current.period ?? 'year');
+  const [state, setState] = useState(saved.current.state ?? null);
+  const [locationAddress, setLocationAddress] = useState(saved.current.locationAddress ?? '');
   const [detecting, setDetecting] = useState(false);
   const [detectError, setDetectError] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    try { sessionStorage.setItem(PROFILE_SETUP_KEY, JSON.stringify({ step, name, phone, email, occupation, budget, period, state, locationAddress })); } catch {}
+  }, [step, name, phone, email, occupation, budget, period, state, locationAddress]);
 
   async function handleDetectLocation() {
     setDetecting(true);
@@ -65,6 +75,11 @@ export default function ProfileSetup() {
     (currentStep === 'occupation' && !!occupation) ||
     (currentStep === 'budget' && budget.length > 0) ||
     (currentStep === 'state' && !!state);
+
+  function skipPhone() {
+    setPhone('');
+    setStep(step + 1);
+  }
 
   const firstName = (name.trim().split(' ')[0] || user?.name?.split(' ')[0]) ?? 'You';
   const initials = firstName.charAt(0).toUpperCase();
@@ -105,15 +120,17 @@ export default function ProfileSetup() {
         state: state ?? undefined,
         country: 'Nigeria',
       });
+      try { sessionStorage.removeItem(PROFILE_SETUP_KEY); } catch {}
       navigate(postAuthRoute(user), { replace: true });
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Please try again.';
       if (msg.toLowerCase().includes('email')) {
         const emailStep = STEPS.indexOf('email');
-        if (emailStep !== -1) {
-          setStep(emailStep);
-          setEmailTaken(true);
-        }
+        if (emailStep !== -1) { setStep(emailStep); setEmailTaken(true); }
+      } else if (msg.toLowerCase().includes('phone')) {
+        const phoneStep = STEPS.indexOf('phone');
+        if (phoneStep !== -1) { setStep(phoneStep); setError(msg); }
+        else setError(msg);
       } else {
         setError(msg);
       }
@@ -173,6 +190,13 @@ export default function ProfileSetup() {
             <h2 className="onb-q-title">What's your phone number?</h2>
             <p className="onb-q-sub">Lets a landlord reach you by WhatsApp or call once they accept your request.</p>
             <PhoneInput value={phone} onChangeValue={setPhone} autoFocus />
+            <button
+              type="button"
+              onClick={skipPhone}
+              style={{ marginTop: 12, background: 'none', border: 'none', color: '#94A3B8', fontSize: 13, cursor: 'pointer', padding: 0 }}
+            >
+              Skip for now
+            </button>
           </>
         )}
 
