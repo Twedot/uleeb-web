@@ -51,6 +51,7 @@ export function AuthProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [pendingPhone, setPendingPhone] = useState(null);
+  const [pendingEmail, setPendingEmail] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -116,6 +117,35 @@ export function AuthProvider({ children }) {
     setPendingPhone(null);
   }
 
+  async function requestEmailCode(emailAddr) {
+    setIsSigningIn(true);
+    try {
+      await api.post('/auth/email/request-code', { email: emailAddr });
+      setPendingEmail(emailAddr);
+    } finally {
+      setIsSigningIn(false);
+    }
+  }
+
+  async function verifyEmailCode(code) {
+    if (!pendingEmail) return null;
+    setIsSigningIn(true);
+    try {
+      const res = await api.post('/auth/email/verify', { email: pendingEmail, code, role: '' });
+      const authUser = await persistSession(res);
+      setPendingEmail(null);
+      return authUser;
+    } catch {
+      return null;
+    } finally {
+      setIsSigningIn(false);
+    }
+  }
+
+  function cancelEmailVerification() {
+    setPendingEmail(null);
+  }
+
   async function setRole(role) {
     if (!token) throw new Error('Not signed in');
     const updated = await api.patch('/me', { role }, token);
@@ -158,6 +188,7 @@ export function AuthProvider({ children }) {
     setToken(null);
     setUser(null);
     setPendingPhone(null);
+    setPendingEmail(null);
   }
 
   return (
@@ -171,6 +202,10 @@ export function AuthProvider({ children }) {
         requestPhoneCode,
         verifyPhoneCode,
         cancelPhoneVerification,
+        pendingEmail,
+        requestEmailCode,
+        verifyEmailCode,
+        cancelEmailVerification,
         setRole,
         updateProfile,
         initiateUpgrade,

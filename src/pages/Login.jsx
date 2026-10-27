@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { PhoneIcon, ChevronLeftIcon } from '../components/icons';
+import { MailIcon, ChevronLeftIcon } from '../components/icons';
 import '../styles/auth.css';
 
 // Mirrors uleeb mobile's app/login.tsx exactly, as of the "phone-only,
@@ -35,8 +35,8 @@ export default function Login() {
           disabled={isSigningIn}
           onClick={() => navigate('/login-phone')}
         >
-          <PhoneIcon size={16} color="#fff" />
-          Continue with phone
+          <MailIcon size={16} color="#fff" />
+          Continue with email
         </button>
 
         <p className="auth-fineprint">

@@ -1,26 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth, postAuthRoute } from '../context/AuthContext';
-import { PhoneInput, isPhoneInputValid, phoneInputToE164 } from '../components/PhoneInput';
 import { ChevronLeftIcon } from '../components/icons';
 import '../styles/auth.css';
 
 const RESEND_COOLDOWN = 60;
 
-// Mirrors uleeb mobile's app/login-phone.tsx — same two-step flow
-// (enter phone -> enter code), same OTP resend cooldown, same
-// create-account-if-new backend behavior.
 export default function LoginPhone() {
-  const { isSigningIn, pendingPhone, requestPhoneCode, verifyPhoneCode, cancelPhoneVerification } = useAuth();
+  const { isSigningIn, pendingEmail, requestEmailCode, verifyEmailCode, cancelEmailVerification } = useAuth();
   const navigate = useNavigate();
-  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [error, setError] = useState(null);
   const [cooldown, setCooldown] = useState(RESEND_COOLDOWN);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
-  const step = pendingPhone ? 'code' : 'phone';
-  const phoneValid = isPhoneInputValid(phone);
+  const step = pendingEmail ? 'code' : 'email';
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
   useEffect(() => {
     if (step !== 'code') return;
@@ -34,21 +30,21 @@ export default function LoginPhone() {
   }, [step, cooldown]);
 
   async function handleSendCode() {
-    if (!phoneValid) return;
+    if (!emailValid) return;
     setError(null);
     try {
-      await requestPhoneCode(phoneInputToE164(phone));
+      await requestEmailCode(email.trim().toLowerCase());
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not send a code. Please try again.');
     }
   }
 
   async function handleResend() {
-    if (cooldown > 0 || isSigningIn || !pendingPhone) return;
+    if (cooldown > 0 || isSigningIn || !pendingEmail) return;
     setCode('');
     setError(null);
     try {
-      await requestPhoneCode(pendingPhone);
+      await requestEmailCode(pendingEmail);
       setCooldown(RESEND_COOLDOWN);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not resend the code. Please try again.');
@@ -57,7 +53,7 @@ export default function LoginPhone() {
 
   async function handleVerify() {
     setError(null);
-    const authUser = await verifyPhoneCode(code.trim());
+    const authUser = await verifyEmailCode(code.trim());
     if (authUser) {
       navigate(postAuthRoute(authUser), { replace: true });
     } else {
@@ -67,7 +63,7 @@ export default function LoginPhone() {
 
   function back() {
     if (step === 'code') {
-      cancelPhoneVerification();
+      cancelEmailVerification();
     } else {
       navigate('/login');
     }
@@ -79,14 +75,23 @@ export default function LoginPhone() {
         <ChevronLeftIcon size={15} />
       </button>
 
-      {step === 'phone' ? (
+      {step === 'email' ? (
         <div className="auth-body" style={{ justifyContent: 'flex-start', paddingTop: 40 }}>
-          <h1 className="auth-title" style={{ marginBottom: 10, textAlign: 'left', width: '100%' }}>Continue with phone</h1>
-          <p className="auth-subtitle">We'll text you a code to verify your number.</p>
+          <h1 className="auth-title" style={{ marginBottom: 10, textAlign: 'left', width: '100%' }}>Continue with email</h1>
+          <p className="auth-subtitle">We'll send you a code to verify your email.</p>
 
           <div className="auth-field">
-            <label className="auth-label">Phone number</label>
-            <PhoneInput value={phone} onChangeValue={(v) => { setPhone(v); setError(null); }} autoFocus />
+            <label className="auth-label">Email address</label>
+            <input
+              className="auth-input"
+              type="email"
+              value={email}
+              onChange={(e) => { setEmail(e.target.value); setError(null); }}
+              placeholder="you@example.com"
+              inputMode="email"
+              autoCapitalize="none"
+              autoFocus
+            />
           </div>
           {error && <p className="auth-error">{error}</p>}
 
@@ -108,7 +113,7 @@ export default function LoginPhone() {
       ) : (
         <div className="auth-body" style={{ justifyContent: 'flex-start', paddingTop: 40 }}>
           <h1 className="auth-title" style={{ marginBottom: 10, textAlign: 'left', width: '100%' }}>Enter the code</h1>
-          <p className="auth-subtitle">We sent a code to {pendingPhone}.</p>
+          <p className="auth-subtitle">We sent a 6-digit code to <strong>{pendingEmail}</strong>.</p>
 
           <div className="auth-field">
             <label className="auth-label">Verification code</label>
@@ -116,7 +121,7 @@ export default function LoginPhone() {
               className="auth-input auth-code-input"
               value={code}
               onChange={(e) => { setCode(e.target.value.replace(/\D/g, '')); setError(null); }}
-              placeholder="0000"
+              placeholder="000000"
               inputMode="numeric"
               maxLength={6}
               autoFocus
@@ -137,15 +142,15 @@ export default function LoginPhone() {
       )}
 
       <div className="auth-footer">
-        {step === 'phone' ? (
+        {step === 'email' ? (
           <button
             onClick={handleSendCode}
-            disabled={!phoneValid || !termsAccepted || isSigningIn}
+            disabled={!emailValid || !termsAccepted || isSigningIn}
             style={{
               height: 54, borderRadius: 999,
               background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: '#fff', border: 'none',
-              fontSize: 15, fontWeight: 600, cursor: (!phoneValid || !termsAccepted || isSigningIn) ? 'default' : 'pointer',
-              opacity: (!phoneValid || !termsAccepted || isSigningIn) ? 0.4 : 1,
+              fontSize: 15, fontWeight: 600, cursor: (!emailValid || !termsAccepted || isSigningIn) ? 'default' : 'pointer',
+              opacity: (!emailValid || !termsAccepted || isSigningIn) ? 0.4 : 1,
               boxShadow: '0 4px 16px rgba(15,23,42,0.20)',
             }}
           >
@@ -154,12 +159,12 @@ export default function LoginPhone() {
         ) : (
           <button
             onClick={handleVerify}
-            disabled={code.length < 4 || isSigningIn}
+            disabled={code.length < 6 || isSigningIn}
             style={{
               height: 54, borderRadius: 999,
               background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: '#fff', border: 'none',
-              fontSize: 15, fontWeight: 600, cursor: (code.length < 4 || isSigningIn) ? 'default' : 'pointer',
-              opacity: (code.length < 4 || isSigningIn) ? 0.4 : 1,
+              fontSize: 15, fontWeight: 600, cursor: (code.length < 6 || isSigningIn) ? 'default' : 'pointer',
+              opacity: (code.length < 6 || isSigningIn) ? 0.4 : 1,
               boxShadow: '0 4px 16px rgba(15,23,42,0.20)',
             }}
           >
