@@ -26,6 +26,8 @@ export default function LandlordSetup() {
   const [name, setName] = useState(saved.current.name ?? (user?.name && user.name !== 'You' ? user.name : ''));
   const [phone, setPhone] = useState(saved.current.phone ?? '');
   const [email, setEmail] = useState(saved.current.email ?? '');
+  const [phoneTaken, setPhoneTaken] = useState(false);
+  const [phoneChecking, setPhoneChecking] = useState(false);
   const [emailTaken, setEmailTaken] = useState(false);
   const [emailChecking, setEmailChecking] = useState(false);
   const [landlordType, setLandlordType] = useState(saved.current.landlordType ?? user?.landlordType ?? null);
@@ -39,7 +41,7 @@ export default function LandlordSetup() {
   const currentStep = STEPS[step];
   const canContinue =
     (currentStep === 'name' && name.trim().length > 1) ||
-    (currentStep === 'phone' && isPhoneInputValid(phone)) ||
+    (currentStep === 'phone' && isPhoneInputValid(phone) && !phoneTaken && !phoneChecking) ||
     (currentStep === 'email' && EMAIL_RE.test(email.trim()) && !emailTaken && !emailChecking) ||
     (currentStep === 'occupation' && !!landlordType);
 
@@ -53,6 +55,17 @@ export default function LandlordSetup() {
 
   async function next() {
     if (!canContinue) return;
+
+    if (currentStep === 'phone' && !user?.phone) {
+      setPhoneChecking(true);
+      try {
+        const res = await fetch(`https://uleebapi.twedot.com/auth/check-phone?phone=${encodeURIComponent(phoneInputToE164(phone))}`);
+        const data = await res.json().catch(() => ({}));
+        if (data.available === false) { setPhoneTaken(true); return; }
+      } catch { /* network blip — let backend catch it */ } finally {
+        setPhoneChecking(false);
+      }
+    }
 
     if (currentStep === 'email' && !user?.email) {
       setEmailChecking(true);
@@ -150,14 +163,9 @@ export default function LandlordSetup() {
           <>
             <h2 className="onb-q-title">What's your phone number?</h2>
             <p className="onb-q-sub">Lets a tenant reach you by WhatsApp or call once you accept their request.</p>
-            <PhoneInput value={phone} onChangeValue={setPhone} autoFocus />
-            <button
-              type="button"
-              onClick={skipPhone}
-              style={{ marginTop: 12, background: 'none', border: 'none', color: '#94A3B8', fontSize: 13, cursor: 'pointer', padding: 0 }}
-            >
-              Skip for now
-            </button>
+            <PhoneInput value={phone} onChangeValue={(v) => { setPhone(v); setPhoneTaken(false); }} autoFocus />
+            {phoneChecking && <p style={{ fontSize: 12.5, color: '#94A3B8', marginTop: 6 }}>Checking…</p>}
+            {phoneTaken && <p style={{ fontSize: 12.5, color: '#C8402A', marginTop: 6 }}>This phone number is already linked to another account.</p>}
           </>
         )}
 
