@@ -19,15 +19,16 @@ export default function LandlordSetup() {
   const { user, updateProfile } = useAuth();
   const navigate = useNavigate();
 
-  const STEPS = ['name', ...(user?.phone ? [] : ['phone']), ...(user?.email ? [] : ['email']), 'occupation'];
+  // Frozen at mount — user.phone being set mid-flow must not collapse the array
+  const STEPS = useRef(
+    ['name', ...(user?.phone ? [] : ['phone']), ...(user?.email ? [] : ['email']), 'occupation']
+  ).current;
 
   const saved = useRef(readLandlordSaved());
   const [step, setStep] = useState(saved.current.step ?? 0);
   const [name, setName] = useState(saved.current.name ?? (user?.name && user.name !== 'You' ? user.name : ''));
   const [phone, setPhone] = useState(saved.current.phone ?? '');
   const [email, setEmail] = useState(saved.current.email ?? '');
-  const [phoneTaken, setPhoneTaken] = useState(false);
-  const [phoneChecking, setPhoneChecking] = useState(false);
   const [emailTaken, setEmailTaken] = useState(false);
   const [emailChecking, setEmailChecking] = useState(false);
   const [landlordType, setLandlordType] = useState(saved.current.landlordType ?? user?.landlordType ?? null);
@@ -41,30 +42,29 @@ export default function LandlordSetup() {
   const currentStep = STEPS[step];
   const canContinue =
     (currentStep === 'name' && name.trim().length > 1) ||
-    (currentStep === 'phone' && isPhoneInputValid(phone) && !phoneTaken && !phoneChecking) ||
+    (currentStep === 'phone' && isPhoneInputValid(phone)) ||
     (currentStep === 'email' && EMAIL_RE.test(email.trim()) && !emailTaken && !emailChecking) ||
     (currentStep === 'occupation' && !!landlordType);
-
-  function skipPhone() {
-    setPhone('');
-    setStep(step + 1);
-  }
 
   const firstName = (name.trim().split(' ')[0] || user?.name?.split(' ')[0]) ?? 'You';
   const initials = firstName.charAt(0).toUpperCase();
 
   async function next() {
-    if (!canContinue) return;
+    if (!canContinue || saving) return;
 
+    // Save phone eagerly on the phone step — error shows here, not on the final step.
     if (currentStep === 'phone' && !user?.phone) {
-      setPhoneChecking(true);
+      setSaving(true);
+      setError(null);
       try {
-        const res = await fetch(`https://uleebapi.twedot.com/auth/check-phone?phone=${encodeURIComponent(phoneInputToE164(phone))}`);
-        const data = await res.json().catch(() => ({}));
-        if (data.available === false) { setPhoneTaken(true); return; }
-      } catch { /* network blip — let backend catch it */ } finally {
-        setPhoneChecking(false);
+        await updateProfile({ phone: phoneInputToE164(phone) });
+        setStep(step + 1);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Please try again.');
+      } finally {
+        setSaving(false);
       }
+      return;
     }
 
     if (currentStep === 'email' && !user?.email) {
@@ -87,12 +87,13 @@ export default function LandlordSetup() {
       setStep(step + 1);
       return;
     }
+
+    // Final step — phone already saved above, skip it here.
     setSaving(true);
     setError(null);
     try {
       await updateProfile({
         name: name.trim() || user?.name || 'You',
-        phone: !user?.phone ? phoneInputToE164(phone) || undefined : undefined,
         email: !user?.email ? email.trim() || undefined : undefined,
         landlordType: landlordType ?? undefined,
       });
@@ -103,10 +104,6 @@ export default function LandlordSetup() {
       if (msg.toLowerCase().includes('email')) {
         const emailStep = STEPS.indexOf('email');
         if (emailStep !== -1) { setStep(emailStep); setEmailTaken(true); }
-      } else if (msg.toLowerCase().includes('phone')) {
-        const phoneStep = STEPS.indexOf('phone');
-        if (phoneStep !== -1) { setStep(phoneStep); setError(msg); }
-        else setError(msg);
       } else {
         setError(msg);
       }
@@ -163,9 +160,7 @@ export default function LandlordSetup() {
           <>
             <h2 className="onb-q-title">What's your phone number?</h2>
             <p className="onb-q-sub">Lets a tenant reach you by WhatsApp or call once you accept their request.</p>
-            <PhoneInput value={phone} onChangeValue={(v) => { setPhone(v); setPhoneTaken(false); }} autoFocus />
-            {phoneChecking && <p style={{ fontSize: 12.5, color: '#94A3B8', marginTop: 6 }}>Checking…</p>}
-            {phoneTaken && <p style={{ fontSize: 12.5, color: '#C8402A', marginTop: 6 }}>This phone number is already linked to another account.</p>}
+            <PhoneInput value={phone} onChangeValue={(v) => { setPhone(v); setError(null); }} autoFocus />
           </>
         )}
 
