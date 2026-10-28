@@ -19,6 +19,10 @@ export default function MyPropertyDetail() {
   const { properties } = useProperties();
 
   const item = properties.find((p) => p.id === id);
+
+  // Must be before any early return so hooks run in the same order every render.
+  const [lightboxIndex, setLightboxIndex] = useState(null);
+
   if (!item) {
     return (
       <div style={styles.notFound}>
@@ -29,7 +33,6 @@ export default function MyPropertyDetail() {
   }
 
   const photos = item.photos ?? [];
-  const [lightboxIndex, setLightboxIndex] = useState(null);
   const statusMeta = {
     verified: { label: 'Verified', bg: '#E3F5EA', color: '#2F8F55' },
     under_review: { label: 'Under review', bg: '#FBF1DA', color: '#B8860B' },

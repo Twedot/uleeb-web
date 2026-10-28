@@ -29,6 +29,10 @@ export default function PropertyDetail() {
   // uleeb-api's PropertyIDsForTenant). Covers navigating here from the
   // Requests tab or a "Message owner" link, not just fresh browsing.
   const item = listings.find((p) => p.id === id) ?? sentRequests.find((r) => r.propertyId === id)?.property;
+
+  // Must be declared before any early return so hooks run in the same order on every render.
+  const [lightboxIndex, setLightboxIndex] = useState(null);
+
   if (!item) {
     return (
       <div style={styles.notFound}>
@@ -41,7 +45,6 @@ export default function PropertyDetail() {
   const photos = item.photos ?? [];
   const status = getStatusFor(item.id);
   const requestId = sentRequests.find((r) => r.propertyId === item.id)?.id;
-  const [lightboxIndex, setLightboxIndex] = useState(null);
 
   async function handleRequest() {
     await sendRequest(item.id);
