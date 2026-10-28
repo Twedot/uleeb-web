@@ -10,6 +10,11 @@ import { Lightbox } from '../components/Lightbox';
 import { VideoPlayer } from '../components/VideoPlayer';
 import { MapView } from '../components/MapView';
 
+const sk = {
+  block: (h, radius = 16) => ({ height: h, borderRadius: radius, background: '#E2E8F0', animation: 'pulse 1.4s ease-in-out infinite' }),
+  line: (w, h, radius = 8, mb = 0) => ({ width: w, height: h, borderRadius: radius, background: '#E2E8F0', animation: 'pulse 1.4s ease-in-out infinite', marginBottom: mb }),
+};
+
 // Web counterpart to uleeb mobile's app/property/[id].tsx, including the
 // status banner ("your request is with the owner" / accepted / declined)
 // backed by SentRequestsContext, and the "Message owner" link into chat
@@ -17,7 +22,7 @@ import { MapView } from '../components/MapView';
 export default function PropertyDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { listings } = useListings();
+  const { listings, loading } = useListings();
   const { isBookmarked, toggleBookmark } = useBookmarks();
   const { sentRequests, sendRequest, getStatusFor } = useSentRequests();
   const { user } = useAuth();
@@ -32,6 +37,29 @@ export default function PropertyDetail() {
 
   // Must be declared before any early return so hooks run in the same order on every render.
   const [lightboxIndex, setLightboxIndex] = useState(null);
+
+  if (loading && !item) {
+    return (
+      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '24px 24px 48px' }}>
+        <div style={sk.line(100, 14, 0, 16)} />
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.1fr) minmax(0,1fr)', gap: 40 }}>
+          <div style={sk.block(460)} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: 8 }}>
+            <div style={sk.line('70%', 28)} />
+            <div style={sk.line('45%', 14)} />
+            <div style={{ display: 'flex', gap: 8 }}>
+              <div style={sk.line(60, 14)} />
+              <div style={sk.line(60, 14)} />
+              <div style={sk.line(60, 14)} />
+            </div>
+            <div style={sk.line('50%', 32, 0, 8)} />
+            <div style={sk.block(50, 999)} />
+            <div style={sk.block(50, 999)} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!item) {
     return (

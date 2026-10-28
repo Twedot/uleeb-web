@@ -4,9 +4,12 @@ import { useAuth, postAuthRoute, isRoleVerified } from '../context/AuthContext';
 import { HomeIcon, KeyIcon } from '../components/icons';
 import '../styles/auth.css';
 
+// key = internal selection identifier, role = backend role value
+// 'agent' maps to 'landlord' — agents list and manage properties the same way
 const OPTIONS = [
-  { role: 'tenant', title: 'Tenant', sub: 'Swipe on homes and request the ones you like' },
-  { role: 'landlord', title: 'Landlord', sub: 'List a property and review interested tenants' },
+  { key: 'tenant',   role: 'tenant',   title: 'Tenant',   sub: 'Swipe on homes and request the ones you like', Icon: HomeIcon },
+  { key: 'landlord', role: 'landlord', title: 'Landlord', sub: 'List a property and review interested tenants', Icon: KeyIcon },
+  { key: 'agent',    role: 'landlord', title: 'Agent',    sub: 'List properties on behalf of owners and manage viewings', Icon: KeyIcon },
 ];
 
 // Mirrors uleeb mobile's app/account-type.tsx, including the free-plan
@@ -21,27 +24,31 @@ export default function AccountType() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
 
+  const selectedOption = OPTIONS.find((o) => o.key === selected) ?? OPTIONS.find((o) => o.role === selected);
+
   async function handleContinue() {
-    if (!selected) return;
+    if (!selectedOption) return;
     setError(null);
 
-    if (selected === user?.role) {
+    const targetRole = selectedOption.role;
+
+    if (targetRole === user?.role) {
       navigate(-1);
       return;
     }
 
     if (isSwitching && (user?.plan ?? 'free') === 'free') {
-      setError(`Your account is currently set up as a ${user?.role}. Switching to ${selected} is a Plus/Pro feature — upgrade to switch.`);
+      setError(`Your account is currently set up as a ${user?.role}. Switching to ${targetRole} is a Plus/Pro feature — upgrade to switch.`);
       return;
     }
 
     setSaving(true);
     try {
-      const updated = await setRole(selected);
-      if (isRoleVerified(updated, selected)) {
+      const updated = await setRole(targetRole);
+      if (isRoleVerified(updated, targetRole)) {
         navigate(postAuthRoute(updated), { replace: true });
       } else {
-        navigate(selected === 'tenant' ? '/profile-setup' : '/landlord-setup', { replace: true });
+        navigate(targetRole === 'tenant' ? '/profile-setup' : '/landlord-setup', { replace: true });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Please try again.');
@@ -65,12 +72,11 @@ export default function AccountType() {
 
       <div className="onb-question" style={{ paddingTop: 8, display: 'flex', flexDirection: 'column', gap: 12 }}>
         {OPTIONS.map((opt) => {
-          const active = selected === opt.role;
-          const Icon = opt.role === 'tenant' ? HomeIcon : KeyIcon;
+          const active = selected === opt.key;
           return (
             <button
-              key={opt.role}
-              onClick={() => { setSelected(opt.role); setError(null); }}
+              key={opt.key}
+              onClick={() => { setSelected(opt.key); setError(null); }}
               style={{
                 display: 'flex', alignItems: 'center', gap: 14, padding: 16, borderRadius: 24,
                 border: `1.5px solid ${active ? '#0F172A' : 'var(--border)'}`, background: '#fff',
@@ -82,7 +88,7 @@ export default function AccountType() {
                 background: active ? 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)' : 'var(--bg-alt)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <Icon size={22} color={active ? '#fff' : 'var(--text)'} />
+                <opt.Icon size={22} color={active ? '#fff' : 'var(--text)'} />
               </div>
               <div style={{ flex: 1 }}>
                 <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: 17, color: 'var(--text)', marginBottom: 3, fontWeight: 700 }}>
@@ -105,16 +111,16 @@ export default function AccountType() {
       <div className="onb-footer">
         <button
           onClick={handleContinue}
-          disabled={!selected || saving}
+          disabled={!selectedOption || saving}
           style={{
             height: 54, width: '100%', borderRadius: 999, border: 'none',
             background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: '#fff',
             boxShadow: '0 4px 16px rgba(15,23,42,0.20)',
-            fontSize: 15, fontWeight: 600, cursor: (!selected || saving) ? 'default' : 'pointer',
-            opacity: (!selected || saving) ? 0.4 : 1,
+            fontSize: 15, fontWeight: 600, cursor: (!selectedOption || saving) ? 'default' : 'pointer',
+            opacity: (!selectedOption || saving) ? 0.4 : 1,
           }}
         >
-          {saving ? 'Saving...' : selected && selected !== user?.role ? 'Switch' : 'Continue'}
+          {saving ? 'Saving...' : selectedOption && selectedOption.role !== user?.role ? 'Switch' : 'Continue'}
         </button>
       </div>
     </div>

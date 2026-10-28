@@ -11,11 +11,11 @@ const ListingsContext = createContext(null);
 export function ListingsProvider({ children }) {
   const { token } = useAuth();
   const [listings, setListings] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(
     async (country) => {
-      if (!token) return;
+      if (!token) { setLoading(false); return; }
       setLoading(true);
       try {
         const query = country ? `?country=${encodeURIComponent(country)}` : '';

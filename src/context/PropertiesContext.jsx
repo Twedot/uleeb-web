@@ -12,13 +12,13 @@ const PropertiesContext = createContext(null);
 export function PropertiesProvider({ children }) {
   const { token } = useAuth();
   const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     // Not gated on current role — properties you've listed stay yours
     // across a role switch, and the backend already scopes this to what
     // you actually own.
-    if (!token) return;
+    if (!token) { setLoading(false); return; }
     setLoading(true);
     try {
       const list = await api.get('/properties/mine/list', token);

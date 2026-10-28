@@ -1,5 +1,10 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+
+const sk = {
+  block: (h, radius = 16) => ({ height: h, borderRadius: radius, background: '#E2E8F0', animation: 'pulse 1.4s ease-in-out infinite' }),
+  line: (w, h, radius = 8, mb = 0) => ({ width: w, height: h, borderRadius: radius, background: '#E2E8F0', animation: 'pulse 1.4s ease-in-out infinite', marginBottom: mb }),
+};
 import { useProperties } from '../context/PropertiesContext';
 import { CheckIcon, ChevronLeftIcon, PinIcon, FileIcon } from '../components/icons';
 import { PhotoCarousel } from '../components/PhotoCarousel';
@@ -16,12 +21,37 @@ import { MapView } from '../components/MapView';
 export default function MyPropertyDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { properties } = useProperties();
+  const { properties, loading } = useProperties();
 
   const item = properties.find((p) => p.id === id);
 
   // Must be before any early return so hooks run in the same order every render.
   const [lightboxIndex, setLightboxIndex] = useState(null);
+
+  if (loading && !item) {
+    return (
+      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '24px 24px 48px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
+          <div style={sk.line(140, 14)} />
+          <div style={sk.line(100, 14)} />
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.1fr) minmax(0,1fr)', gap: 40 }}>
+          <div style={sk.block(400)} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: 8 }}>
+            <div style={sk.line('70%', 28)} />
+            <div style={sk.line('45%', 14)} />
+            <div style={{ display: 'flex', gap: 8 }}>
+              <div style={sk.line(60, 14)} />
+              <div style={sk.line(60, 14)} />
+              <div style={sk.line(60, 14)} />
+            </div>
+            <div style={sk.line('50%', 32, 0, 8)} />
+            <div style={sk.block(120, 16)} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!item) {
     return (
