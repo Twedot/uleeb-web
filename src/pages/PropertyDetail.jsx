@@ -37,6 +37,7 @@ export default function PropertyDetail() {
 
   // Must be declared before any early return so hooks run in the same order on every render.
   const [lightboxIndex, setLightboxIndex] = useState(null);
+  const [showSaveUpgrade, setShowSaveUpgrade] = useState(false);
 
   if (loading && !item) {
     return (
@@ -79,10 +80,7 @@ export default function PropertyDetail() {
   }
 
   async function handleBookmark() {
-    if (!isPro) {
-      if (window.confirm('Saving homes is a Plus feature. Upgrade to Plus or Pro to use this — view plans?')) navigate('/plans');
-      return;
-    }
+    if (!isPro) { setShowSaveUpgrade(true); return; }
     try {
       await toggleBookmark(item.id);
     } catch {
@@ -179,14 +177,25 @@ export default function PropertyDetail() {
           )}
 
           {user?.role !== 'landlord' && (
-            <div style={styles.actions}>
-              <button type="button" style={styles.saveBtn} onClick={handleBookmark}>
-                {isBookmarked(item.id) ? 'Saved' : 'Save'}
-              </button>
-              <button type="button" style={styles.requestBtn} onClick={handleRequest} disabled={!!status}>
-                {status ? 'Request sent' : 'Request to view'}
-              </button>
-            </div>
+            <>
+              <div style={styles.actions}>
+                <button type="button" style={styles.saveBtn} onClick={handleBookmark}>
+                  {isBookmarked(item.id) ? 'Saved' : 'Save'}
+                </button>
+                <button type="button" style={styles.requestBtn} onClick={handleRequest} disabled={!!status}>
+                  {status ? 'Request sent' : 'Request to view'}
+                </button>
+              </div>
+              {showSaveUpgrade && (
+                <div style={styles.upgradeBanner}>
+                  <p style={styles.upgradeBannerText}>Saving homes needs a Plus or Pro plan.</p>
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <button type="button" style={styles.upgradeBtn} onClick={() => navigate('/plans')}>Upgrade</button>
+                    <button type="button" style={styles.dismissUpgradeBtn} onClick={() => setShowSaveUpgrade(false)}>Not now</button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
 
           {status && (
@@ -258,6 +267,19 @@ const styles = {
   costRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 8, marginBottom: 0 },
   costLabel: { fontSize: 13.5, color: '#475569' },
   costVal: { fontSize: 13.5, color: '#0F172A', fontWeight: 600 },
+  upgradeBanner: {
+    background: '#EEF6FF', border: '1px solid #BFDBFE', borderRadius: 16, padding: '14px 16px', marginTop: 4,
+  },
+  upgradeBannerText: { fontSize: 13.5, color: '#0F172A', marginBottom: 10, lineHeight: '19px' },
+  upgradeBtn: {
+    height: 38, padding: '0 18px', borderRadius: 999, border: 'none',
+    background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: '#FFFFFF',
+    fontSize: 13, fontWeight: 700, cursor: 'pointer',
+  },
+  dismissUpgradeBtn: {
+    height: 38, padding: '0 14px', borderRadius: 999, border: '1px solid #BFDBFE',
+    background: '#FFFFFF', color: '#475569', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+  },
   amenitiesWrap: { display: 'flex', flexWrap: 'wrap', gap: 10 },
   amenity: {
     display: 'flex', alignItems: 'center', gap: 8, background: '#FFFFFF',

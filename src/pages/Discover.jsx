@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useListings } from '../context/ListingsContext';
@@ -24,6 +24,7 @@ export default function Discover() {
   const navigate = useNavigate();
   const deckRef = useRef(null);
   const isPro = user?.plan === 'plus' || user?.plan === 'pro';
+  const [upgradeMsg, setUpgradeMsg] = useState(null);
 
   const filterActive = !allNigeria && selectedStates.length > 0;
 
@@ -46,9 +47,7 @@ export default function Discover() {
         : 'Swipe to see homes near you';
 
   function requireProPlan(feature) {
-    if (window.confirm(`${feature} is a Plus feature. Upgrade to Plus or Pro to use this — view plans?`)) {
-      navigate('/plans');
-    }
+    setUpgradeMsg(`${feature} is a Plus / Pro feature.`);
   }
 
   async function handleBookmarkPress() {
@@ -73,7 +72,7 @@ export default function Discover() {
       if (direction === 'right') refreshSentRequests();
     } catch (err) {
       if (err instanceof ApiError && err.status === 402) {
-        if (window.confirm(`You've hit your swipe limit. ${err.message} — view plans?`)) navigate('/plans');
+        setUpgradeMsg(`Swipe limit reached — ${err.message}`);
       }
       // Other failures (network blip, etc.) fail silently — the card
       // already animated away and there's nothing useful to undo here.
@@ -107,9 +106,14 @@ export default function Discover() {
               <p style={styles.emptyTitle}>You're all caught up</p>
               <p style={styles.emptySub}>
                 {user?.plan === 'free'
-                  ? "Nothing new for now — you may be at today's swipe limit (resets in 24 hours), or everything's been seen recently. Upgrade for unlimited swiping."
+                  ? "Nothing new for now — you may be at today's swipe limit (resets in 24 hours), or everything's been seen recently."
                   : "Check back soon for new verified listings in your area."}
               </p>
+              {user?.plan === 'free' && (
+                <button type="button" style={styles.emptyUpgradeBtn} onClick={() => navigate('/plans')}>
+                  Upgrade for unlimited swiping
+                </button>
+              )}
             </div>
           )}
         />
@@ -126,6 +130,16 @@ export default function Discover() {
           <HeartIcon size={26} color="#FFFFFF" />
         </button>
       </div>
+
+      {upgradeMsg && (
+        <div style={styles.upgradeToast}>
+          <p style={styles.upgradeToastText}>{upgradeMsg}</p>
+          <div style={styles.upgradeToastRow}>
+            <button type="button" style={styles.upgradeBtn} onClick={() => navigate('/plans')}>Upgrade</button>
+            <button type="button" style={styles.dismissBtn} onClick={() => setUpgradeMsg(null)}>Not now</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -172,5 +186,26 @@ const styles = {
     background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)',
     border: 'none', boxShadow: '0 4px 20px rgba(15,23,42,0.22)',
     display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+  },
+  upgradeToast: {
+    marginTop: 16, width: '100%', maxWidth: CARD_COLUMN_WIDTH,
+    background: '#0F172A', borderRadius: 20, padding: '16px 18px',
+    boxShadow: '0 8px 32px rgba(15,23,42,0.22)',
+  },
+  upgradeToastText: { fontSize: 13.5, color: '#FFFFFF', marginBottom: 12, lineHeight: '19px' },
+  upgradeToastRow: { display: 'flex', gap: 10 },
+  upgradeBtn: {
+    flex: 1, height: 40, borderRadius: 999, border: 'none',
+    background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)', color: '#FFFFFF',
+    fontSize: 13, fontWeight: 700, cursor: 'pointer',
+  },
+  dismissBtn: {
+    height: 40, padding: '0 16px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.2)',
+    background: 'transparent', color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+  },
+  emptyUpgradeBtn: {
+    marginTop: 16, height: 44, padding: '0 22px', borderRadius: 999, border: 'none',
+    background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: '#FFFFFF',
+    fontSize: 13.5, fontWeight: 700, cursor: 'pointer',
   },
 };

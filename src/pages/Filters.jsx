@@ -15,6 +15,7 @@ export default function Filters() {
   const isPlus = user?.plan === 'plus' || isPro;
   const [stateSearch, setStateSearch] = useState('');
   const [countries, setCountries] = useState([]);
+  const [proNudge, setProNudge] = useState(false);
 
   useEffect(() => {
     if (!isPro || !token) return;
@@ -38,12 +39,7 @@ export default function Filters() {
   }
 
   function toggleAllNigeria() {
-    if (!isPro) {
-      if (window.confirm('Filtering across all of Nigeria needs a Pro plan — view plans?')) {
-        navigate('/plans');
-      }
-      return;
-    }
+    if (!isPro) { setProNudge(true); return; }
     const next = !allNigeria;
     setAllNigeria(next);
     if (next) setSelectedStates([]);
@@ -107,6 +103,16 @@ export default function Filters() {
             All Nigeria{!isPro ? ' · Pro' : ''}
           </span>
         </button>
+
+        {proNudge && (
+          <div style={styles.proNudge}>
+            <p style={styles.proNudgeText}>Filtering all of Nigeria needs a Pro plan.</p>
+            <div style={styles.proNudgeBtns}>
+              <button type="button" style={styles.upgradeBtn} onClick={() => navigate('/plans')}>Upgrade to Pro</button>
+              <button type="button" style={styles.dismissBtn} onClick={() => setProNudge(false)}>Not now</button>
+            </div>
+          </div>
+        )}
 
         <div style={styles.stateSearchWrap}>
           <SearchIcon size={13} color="#94A3B8" />
@@ -185,6 +191,20 @@ const styles = {
   },
   chipActive: { background: '#2563EB', borderColor: '#2563EB', color: '#FFFFFF' },
   chipDisabled: { opacity: 0.4, cursor: 'default' },
+  proNudge: {
+    background: '#EEF6FF', border: '1px solid #BFDBFE', borderRadius: 14, padding: '12px 14px',
+  },
+  proNudgeText: { fontSize: 13, color: '#0F172A', marginBottom: 10, lineHeight: '18px' },
+  proNudgeBtns: { display: 'flex', gap: 8 },
+  upgradeBtn: {
+    height: 36, padding: '0 16px', borderRadius: 999, border: 'none',
+    background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: '#FFFFFF',
+    fontSize: 12.5, fontWeight: 700, cursor: 'pointer',
+  },
+  dismissBtn: {
+    height: 36, padding: '0 12px', borderRadius: 999, border: '1px solid #BFDBFE',
+    background: '#FFFFFF', color: '#475569', fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
+  },
   footer: { marginTop: 'auto', padding: '16px 24px 0' },
   applyBtn: {
     width: '100%', height: 50, borderRadius: 999,

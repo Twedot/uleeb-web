@@ -44,7 +44,7 @@ export default function Profile() {
             )}
           </div>
           <p style={styles.plan}>
-            {(isLandlord ? 'LANDLORD' : 'TENANT')} · {planLabel} PLAN
+            {(isLandlord ? 'LANDLORD / AGENT' : 'TENANT')} · {planLabel} PLAN
           </p>
         </div>
       </button>
@@ -52,7 +52,7 @@ export default function Profile() {
       {!verified && (
         <button type="button" style={styles.nudge} onClick={() => navigate('/edit-profile')}>
           <div style={{ flex: 1, textAlign: 'left' }}>
-            <p style={styles.nudgeTitle}>Finish setting up your {isLandlord ? 'landlord' : 'tenant'} profile</p>
+            <p style={styles.nudgeTitle}>Finish setting up your {isLandlord ? 'landlord / agent' : 'tenant'} profile</p>
             <p style={styles.nudgeSub}>
               {isLandlord ? 'Add how you list properties to get verified.' : 'Add your occupation, budget, and state to get verified.'}
             </p>
@@ -107,7 +107,7 @@ export default function Profile() {
       <div style={styles.menu}>
         <MenuRow label="Edit profile" sub="Name, occupation, state" onClick={() => navigate('/edit-profile')} />
         <MenuRow
-          label={isLandlord ? 'Switch to tenant' : 'Switch to landlord'}
+          label={isLandlord ? 'Switch to tenant' : 'Switch to landlord or agent'}
           sub={isLandlord ? 'Browse and request homes instead' : 'List a property instead'}
           onClick={() => navigate('/account-type')}
         />

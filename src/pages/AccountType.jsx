@@ -105,7 +105,22 @@ export default function AccountType() {
             </button>
           );
         })}
-        {error && <p className="auth-error">{error}</p>}
+        {error && (
+          <div>
+            <p className="auth-error">{error}</p>
+            {error.includes('Plus/Pro') && (
+              <button
+                type="button"
+                onClick={() => navigate('/plans')}
+                style={{ marginTop: 8, height: 44, width: '100%', borderRadius: 999, border: 'none',
+                  background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)', color: '#fff',
+                  fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
+              >
+                Upgrade to switch
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="onb-footer">
