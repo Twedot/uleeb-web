@@ -104,7 +104,7 @@ export default function MyPropertyDetail() {
           <ChevronLeftIcon size={14} color="#475569" /> Back to your properties
         </button>
         <div style={{ display: 'flex', gap: 10 }}>
-          {item.verificationStatus !== 'verified' && item.verificationStatus !== 'rented' && (
+          {item.verificationStatus !== 'rented' && (
             <button type="button" onClick={handleDelete} disabled={deleting} style={styles.deleteBtn}>
               {deleting ? 'Deleting…' : 'Delete'}
             </button>

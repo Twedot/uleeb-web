@@ -41,7 +41,7 @@ export function VideoPlayer({ src }) {
 
 const s = {
   wrap: { position: 'relative', width: '100%', borderRadius: 18, overflow: 'hidden', background: '#0F172A', marginTop: 12 },
-  video: { width: '100%', aspectRatio: '16/9', display: 'block', objectFit: 'cover' },
+  video: { width: '100%', height: 'auto', maxHeight: 600, display: 'block', objectFit: 'contain' },
   overlay: {
     position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
     alignItems: 'center', justifyContent: 'center', gap: 10,
