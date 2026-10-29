@@ -43,13 +43,14 @@ export default function AddProperty() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
+  const [attempted, setAttempted] = useState(false);
+
   const canSubmit =
     title.trim().length > 2 &&
     location.trim().length > 2 &&
     !!state &&
     price.length > 0 &&
-    photos.length >= MIN_PHOTOS &&
-    !!video;
+    photos.length >= MIN_PHOTOS;
 
   function addCharge() { setExtraCharges((p) => [...p, { name: '', amount: '' }]); }
   function updateCharge(i, field, val) { setExtraCharges((p) => p.map((c, idx) => idx === i ? { ...c, [field]: val } : c)); }
@@ -70,7 +71,7 @@ export default function AddProperty() {
   }
 
   async function handleSubmit() {
-    if (!canSubmit) return;
+    if (!canSubmit) { setAttempted(true); return; }
     setSubmitting(true);
     setError(null);
     try {
@@ -116,11 +117,11 @@ export default function AddProperty() {
       <p style={styles.subtitle}>Add the details tenants need to decide.</p>
 
       <div style={styles.form}>
-        <Field label="Property title">
-          <input style={styles.input} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="2-bed flat, Lekki Phase 1" />
+        <Field label="Property title" hasError={attempted && title.trim().length <= 2}>
+          <input style={{ ...styles.input, ...(attempted && title.trim().length <= 2 ? { borderColor: '#C8402A' } : {}) }} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="2-bed flat, Lekki Phase 1" />
         </Field>
 
-        <Field label="Address / area">
+        <Field label="Address / area" hasError={attempted && location.trim().length <= 2}>
           <LocationAutocomplete
             value={location}
             placeholder="Start typing an address or area…"
@@ -135,7 +136,7 @@ export default function AddProperty() {
           />
         </Field>
 
-        <Field label="State">
+        <Field label="State" hasError={attempted && !state}>
           <StateSelect value={state} onChange={setState} />
         </Field>
 
@@ -149,8 +150,8 @@ export default function AddProperty() {
         </Field>
 
         <div style={styles.row2}>
-          <Field label="Price / yr (₦)">
-            <input style={styles.input} value={price} onChange={(e) => setPrice(e.target.value.replace(/[^0-9]/g, ''))} inputMode="numeric" placeholder="2400000" />
+          <Field label="Price / yr (₦)" hasError={attempted && price.length === 0}>
+            <input style={{ ...styles.input, ...(attempted && price.length === 0 ? { borderColor: '#C8402A' } : {}) }} value={price} onChange={(e) => setPrice(e.target.value.replace(/[^0-9]/g, ''))} inputMode="numeric" placeholder="2400000" />
           </Field>
           <Field label="Bedrooms">
             <input style={styles.input} value={bedrooms} onChange={(e) => setBedrooms(e.target.value.replace(/[^0-9]/g, ''))} inputMode="numeric" placeholder="2" />
@@ -199,7 +200,7 @@ export default function AddProperty() {
           <p style={styles.hint}>Security deposit, service charge, electricity fee, etc.</p>
         </Field>
 
-        <Field label={`Photos (min. ${MIN_PHOTOS})`}>
+        <Field label={`Photos (min. ${MIN_PHOTOS})`} hasError={attempted && photos.length < MIN_PHOTOS}>
           <div style={styles.photoGrid}>
             {photos.map((file, i) => (
               <div key={i} style={styles.photoThumb}>
@@ -218,7 +219,7 @@ export default function AddProperty() {
           <p style={styles.hint}>{photos.length} of {MIN_PHOTOS} minimum photos added.</p>
         </Field>
 
-        <Field label="Walkthrough video">
+        <Field label="Walkthrough video (optional)">
           {video ? (
             <div style={styles.fileRow}>
               <FileIcon size={16} color="#475569" />
@@ -256,7 +257,7 @@ export default function AddProperty() {
 
         {error && <p style={styles.error}>{error}</p>}
 
-        <button type="button" style={{ ...styles.submitBtn, ...((!canSubmit || submitting) ? { opacity: 0.4, cursor: 'default' } : null) }} onClick={handleSubmit} disabled={!canSubmit || submitting}>
+        <button type="button" style={{ ...styles.submitBtn, ...((submitting) ? { opacity: 0.4, cursor: 'default' } : null) }} onClick={handleSubmit} disabled={submitting}>
           {submitting ? 'Listing…' : 'List this property'}
         </button>
       </div>
@@ -264,11 +265,12 @@ export default function AddProperty() {
   );
 }
 
-function Field({ label, children }) {
+function Field({ label, children, hasError }) {
   return (
-    <div style={styles.field}>
-      <p style={styles.label}>{label}</p>
+    <div style={{ ...styles.field, ...(hasError ? { paddingLeft: 8, borderLeft: '2px solid #C8402A' } : {}) }}>
+      <p style={{ ...styles.label, ...(hasError ? { color: '#C8402A' } : {}) }}>{label}</p>
       {children}
+      {hasError && <p style={{ fontSize: 11.5, color: '#C8402A', marginTop: 4 }}>This field is required</p>}
     </div>
   );
 }

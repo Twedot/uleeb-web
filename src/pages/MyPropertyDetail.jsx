@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+
 const sk = {
   block: (h, radius = 16) => ({ height: h, borderRadius: radius, background: '#E2E8F0', animation: 'pulse 1.4s ease-in-out infinite' }),
   line: (w, h, radius = 8, mb = 0) => ({ width: w, height: h, borderRadius: radius, background: '#E2E8F0', animation: 'pulse 1.4s ease-in-out infinite', marginBottom: mb }),
@@ -21,12 +22,25 @@ import { MapView } from '../components/MapView';
 export default function MyPropertyDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { properties, loading } = useProperties();
+  const { properties, loading, deleteProperty } = useProperties();
 
   const item = properties.find((p) => p.id === id);
 
   // Must be before any early return so hooks run in the same order every render.
   const [lightboxIndex, setLightboxIndex] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete() {
+    if (!window.confirm('Delete this property? This cannot be undone.')) return;
+    setDeleting(true);
+    try {
+      await deleteProperty(item?.id);
+      navigate('/properties', { replace: true });
+    } catch (err) {
+      window.alert(err instanceof Error ? err.message : 'Could not delete property.');
+      setDeleting(false);
+    }
+  }
 
   if (loading && !item) {
     return (
@@ -75,9 +89,16 @@ export default function MyPropertyDetail() {
         <button type="button" onClick={() => navigate('/properties')} style={styles.backLinkTop}>
           <ChevronLeftIcon size={14} color="#475569" /> Back to your properties
         </button>
-        <button type="button" onClick={() => navigate(`/my-properties/${item.id}/edit`)} style={styles.editBtn} >
-          Edit property
-        </button>
+        <div style={{ display: 'flex', gap: 10 }}>
+          {item.verificationStatus !== 'verified' && (
+            <button type="button" onClick={handleDelete} disabled={deleting} style={styles.deleteBtn}>
+              {deleting ? 'Deleting…' : 'Delete'}
+            </button>
+          )}
+          <button type="button" onClick={() => navigate(`/my-properties/${item.id}/edit`)} style={styles.editBtn}>
+            Edit property
+          </button>
+        </div>
       </div>
 
       <div className="uleeb-detail-layout" style={styles.layout}>
@@ -176,6 +197,10 @@ const styles = {
   editBtn: {
     height: 38, padding: '0 18px', borderRadius: 999, background: '#0F172A', color: '#FFFFFF',
     border: 'none', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', flexShrink: 0,
+  },
+  deleteBtn: {
+    height: 38, padding: '0 18px', borderRadius: 999, background: '#FFFFFF', color: '#C8402A',
+    border: '1.5px solid #FCA5A5', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', flexShrink: 0,
   },
   layout: { display: 'grid', gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 1fr)', gap: 40 },
   photoCol: { position: 'sticky', top: 88, alignSelf: 'start' },

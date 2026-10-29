@@ -101,9 +101,15 @@ export function PropertiesProvider({ children }) {
     return updated;
   }
 
+  async function deleteProperty(id) {
+    if (!token) throw new Error('Not signed in');
+    await api.del(`/properties/${id}`, token);
+    setProperties((prev) => prev.filter((p) => p.id !== id));
+  }
+
   return (
     <PropertiesContext.Provider
-      value={{ properties, loading, refresh, addProperty, updateProperty, addPropertyMedia, setPropertyPhotos }}
+      value={{ properties, loading, refresh, addProperty, updateProperty, addPropertyMedia, setPropertyPhotos, deleteProperty }}
     >
       {children}
     </PropertiesContext.Provider>
