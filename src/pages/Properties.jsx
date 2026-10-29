@@ -15,8 +15,6 @@ export default function Properties() {
   const limit = user?.plan ? LISTING_LIMITS[user.plan] : undefined;
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [limitBanner, setLimitBanner] = useState(false);
-
   const filtered = useMemo(() => {
     let list = properties;
     if (statusFilter !== 'all') {
@@ -36,7 +34,7 @@ export default function Properties() {
 
   function handleAddProperty() {
     if (limit !== undefined && properties.length >= limit) {
-      setLimitBanner(true);
+      navigate('/plans');
       return;
     }
     navigate('/add-property');
@@ -55,19 +53,6 @@ export default function Properties() {
           Add property
         </button>
       </div>
-
-      {limitBanner && (
-        <div style={styles.limitBanner}>
-          <p style={styles.limitText}>
-            Your {user?.plan} plan is limited to {limit} {limit === 1 ? 'property' : 'properties'}.
-            Upgrade to list more.
-          </p>
-          <div style={styles.limitBtns}>
-            <button type="button" style={styles.upgradeBtn} onClick={() => navigate('/plans')}>Upgrade</button>
-            <button type="button" style={styles.dismissBtn} onClick={() => setLimitBanner(false)}>Not now</button>
-          </div>
-        </div>
-      )}
 
       <div style={styles.controls}>
         <div style={styles.searchWrap}>
@@ -188,19 +173,5 @@ const styles = {
   addBtn: {
     flexShrink: 0, height: 44, padding: '0 22px', borderRadius: 999, background: '#0F172A', color: '#FFFFFF',
     fontSize: 14, fontWeight: 600, border: 'none', cursor: 'pointer',
-  },
-  limitBanner: {
-    background: '#EEF6FF', border: '1px solid #BFDBFE', borderRadius: 16, padding: '14px 16px', marginBottom: 16,
-  },
-  limitText: { fontSize: 13.5, color: '#0F172A', marginBottom: 12, lineHeight: '19px' },
-  limitBtns: { display: 'flex', gap: 10 },
-  upgradeBtn: {
-    height: 38, padding: '0 18px', borderRadius: 999, border: 'none',
-    background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: '#FFFFFF',
-    fontSize: 13, fontWeight: 700, cursor: 'pointer',
-  },
-  dismissBtn: {
-    height: 38, padding: '0 14px', borderRadius: 999, border: '1px solid #BFDBFE',
-    background: '#FFFFFF', color: '#475569', fontSize: 13, fontWeight: 600, cursor: 'pointer',
   },
 };
