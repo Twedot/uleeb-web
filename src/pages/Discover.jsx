@@ -17,7 +17,7 @@ import { ApiError } from '../lib/api';
 export default function Discover() {
   const { user } = useAuth();
   const { listings: properties } = useListings();
-  const { recordSwipe } = useSwipes();
+  const { recordSwipe, swipesRemaining, swipesCap } = useSwipes();
   const { isBookmarked, toggleBookmark } = useBookmarks();
   const { refresh: refreshSentRequests } = useSentRequests();
   const { selectedStates, allNigeria } = useFilters();
@@ -94,6 +94,15 @@ export default function Discover() {
         </div>
       </div>
       <p style={styles.subtitle}>{subtitle}</p>
+
+      {user?.plan === 'free' && swipesRemaining !== null && swipesRemaining >= 0 && (
+        <div style={styles.swipeCountBar}>
+          <div style={{ ...styles.swipeCountFill, width: `${Math.round((swipesRemaining / swipesCap) * 100)}%` }} />
+          <span style={styles.swipeCountText}>
+            {swipesRemaining} of {swipesCap} swipes left today
+          </span>
+        </div>
+      )}
 
       <div style={styles.deckAreaOuter}><div style={styles.deckArea}>
         <SwipeDeck
@@ -207,5 +216,19 @@ const styles = {
     marginTop: 16, height: 44, padding: '0 22px', borderRadius: 999, border: 'none',
     background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: '#FFFFFF',
     fontSize: 13.5, fontWeight: 700, cursor: 'pointer',
+  },
+  swipeCountBar: {
+    position: 'relative', width: '100%', maxWidth: CARD_COLUMN_WIDTH,
+    height: 28, borderRadius: 999, background: '#E2E8F0', overflow: 'hidden',
+    display: 'flex', alignItems: 'center', marginBottom: 16,
+  },
+  swipeCountFill: {
+    position: 'absolute', left: 0, top: 0, bottom: 0, borderRadius: 999,
+    background: 'linear-gradient(90deg, #2563EB 0%, #3B82F6 100%)',
+    transition: 'width 0.4s ease',
+  },
+  swipeCountText: {
+    position: 'relative', zIndex: 1, fontSize: 11.5, fontWeight: 700,
+    color: '#0F172A', paddingLeft: 12,
   },
 };
