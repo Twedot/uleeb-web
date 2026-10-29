@@ -5,7 +5,7 @@ import { useProperties } from '../context/PropertiesContext';
 import { HomeIcon, PlayIcon, SearchIcon } from '../components/icons';
 
 // Web counterpart to uleeb mobile's app/(tabs)/properties.tsx.
-const LISTING_LIMITS = { free: 10, plus: 5 };
+const LISTING_LIMITS = { free: 10, plus: 20 };
 const STATUS_FILTERS = ['all', 'verified', 'under_review', 'unverified'];
 
 export default function Properties() {
