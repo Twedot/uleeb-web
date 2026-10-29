@@ -107,9 +107,16 @@ export function PropertiesProvider({ children }) {
     setProperties((prev) => prev.filter((p) => p.id !== id));
   }
 
+  async function rentProperty(id) {
+    if (!token) throw new Error('Not signed in');
+    const updated = await api.post(`/properties/${id}/rent`, undefined, token);
+    setProperties((prev) => prev.map((p) => (p.id === id ? updated : p)));
+    return updated;
+  }
+
   return (
     <PropertiesContext.Provider
-      value={{ properties, loading, refresh, addProperty, updateProperty, addPropertyMedia, setPropertyPhotos, deleteProperty }}
+      value={{ properties, loading, refresh, addProperty, updateProperty, addPropertyMedia, setPropertyPhotos, deleteProperty, rentProperty }}
     >
       {children}
     </PropertiesContext.Provider>

@@ -6,7 +6,7 @@ import { HomeIcon, PlayIcon, SearchIcon } from '../components/icons';
 
 // Web counterpart to uleeb mobile's app/(tabs)/properties.tsx.
 const LISTING_LIMITS = { free: 7, plus: 15 };
-const STATUS_FILTERS = ['all', 'verified', 'under_review', 'unverified'];
+const STATUS_FILTERS = ['all', 'verified', 'rented', 'under_review', 'unverified'];
 
 export default function Properties() {
   const { user } = useAuth();
@@ -72,7 +72,7 @@ export default function Properties() {
               style={{ ...styles.filterChip, ...(statusFilter === s ? styles.filterChipActive : null) }}
               onClick={() => setStatusFilter(s)}
             >
-              {s === 'all' ? 'All' : s === 'under_review' ? 'Under review' : s.charAt(0).toUpperCase() + s.slice(1)}
+              {s === 'all' ? 'All' : s === 'under_review' ? 'Under review' : s === 'rented' ? 'Rented' : s.charAt(0).toUpperCase() + s.slice(1)}
             </button>
           ))}
         </div>
@@ -123,6 +123,9 @@ function PropertyRow({ item, onClick }) {
         )}
         {item.verificationStatus === 'under_review' && (
           <span style={{ ...styles.statusBadge, background: '#FBF1DA', color: '#B8860B' }}>Under review</span>
+        )}
+        {item.verificationStatus === 'rented' && (
+          <span style={{ ...styles.statusBadge, background: '#F3E8FF', color: '#7C3AED' }}>Rented</span>
         )}
       </div>
     </button>

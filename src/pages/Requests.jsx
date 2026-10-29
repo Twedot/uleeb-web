@@ -154,6 +154,7 @@ function SentRequestRow({ item, isLast, onClick }) {
   const isAccepted = item.status === 'accepted';
   const isDeclined = item.status === 'declined';
   const isPending = item.status === 'new';
+  const isRented = property.verificationStatus === 'rented';
 
   return (
     <button
@@ -177,9 +178,10 @@ function SentRequestRow({ item, isLast, onClick }) {
         <p style={styles.meta}>{property.location}, {property.state}</p>
         <p style={{ ...styles.meta, marginTop: 1 }}>₦{Number(property.price ?? 0).toLocaleString()} / year</p>
       </div>
-      {isPending && <span style={styles.newChip}>Pending</span>}
-      {isAccepted && <span style={{ ...styles.statusChip, background: '#D1FAE5', color: '#15803D' }}>Accepted</span>}
-      {isDeclined && <span style={{ ...styles.statusChip, background: '#F1F5F9', color: '#94A3B8' }}>Declined</span>}
+      {isRented && <span style={{ ...styles.statusChip, background: '#F3E8FF', color: '#7C3AED' }}>Rented</span>}
+      {!isRented && isPending && <span style={styles.newChip}>Pending</span>}
+      {!isRented && isAccepted && <span style={{ ...styles.statusChip, background: '#D1FAE5', color: '#15803D' }}>Accepted</span>}
+      {!isRented && isDeclined && <span style={{ ...styles.statusChip, background: '#F1F5F9', color: '#94A3B8' }}>Declined</span>}
     </button>
   );
 }

@@ -22,13 +22,26 @@ import { MapView } from '../components/MapView';
 export default function MyPropertyDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { properties, loading, deleteProperty } = useProperties();
+  const { properties, loading, deleteProperty, rentProperty } = useProperties();
 
   const item = properties.find((p) => p.id === id);
 
   // Must be before any early return so hooks run in the same order every render.
   const [lightboxIndex, setLightboxIndex] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [renting, setRenting] = useState(false);
+
+  async function handleRent() {
+    if (!window.confirm('Mark this property as rented? It will no longer appear in the discovery feed.')) return;
+    setRenting(true);
+    try {
+      await rentProperty(item?.id);
+    } catch (err) {
+      window.alert(err instanceof Error ? err.message : 'Could not mark as rented.');
+    } finally {
+      setRenting(false);
+    }
+  }
 
   async function handleDelete() {
     if (!window.confirm('Delete this property? This cannot be undone.')) return;
@@ -80,6 +93,7 @@ export default function MyPropertyDetail() {
   const statusMeta = {
     verified: { label: 'Verified', bg: '#E3F5EA', color: '#2F8F55' },
     under_review: { label: 'Under review', bg: '#FBF1DA', color: '#B8860B' },
+    rented: { label: 'Rented', bg: '#F3E8FF', color: '#7C3AED' },
   }[item.verificationStatus];
 
   return (
@@ -90,14 +104,21 @@ export default function MyPropertyDetail() {
           <ChevronLeftIcon size={14} color="#475569" /> Back to your properties
         </button>
         <div style={{ display: 'flex', gap: 10 }}>
-          {item.verificationStatus !== 'verified' && (
+          {item.verificationStatus !== 'verified' && item.verificationStatus !== 'rented' && (
             <button type="button" onClick={handleDelete} disabled={deleting} style={styles.deleteBtn}>
               {deleting ? 'Deleting…' : 'Delete'}
             </button>
           )}
-          <button type="button" onClick={() => navigate(`/my-properties/${item.id}/edit`)} style={styles.editBtn}>
-            Edit property
-          </button>
+          {item.verificationStatus === 'verified' && (
+            <button type="button" onClick={handleRent} disabled={renting} style={styles.rentBtn}>
+              {renting ? 'Marking…' : 'Mark as rented'}
+            </button>
+          )}
+          {item.verificationStatus !== 'rented' && (
+            <button type="button" onClick={() => navigate(`/my-properties/${item.id}/edit`)} style={styles.editBtn}>
+              Edit property
+            </button>
+          )}
         </div>
       </div>
 
@@ -201,6 +222,10 @@ const styles = {
   deleteBtn: {
     height: 38, padding: '0 18px', borderRadius: 999, background: '#FFFFFF', color: '#C8402A',
     border: '1.5px solid #FCA5A5', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', flexShrink: 0,
+  },
+  rentBtn: {
+    height: 38, padding: '0 18px', borderRadius: 999, background: '#F3E8FF', color: '#7C3AED',
+    border: '1.5px solid #DDD6FE', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', flexShrink: 0,
   },
   layout: { display: 'grid', gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 1fr)', gap: 40 },
   photoCol: { position: 'sticky', top: 88, alignSelf: 'start' },
