@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 import { api, ApiError } from '../lib/api';
 import { useAuth } from './AuthContext';
 
+
 // Mirrors uleeb mobile's store/swipes.tsx — records a swipe in either
 // direction (right also creates the Request server-side, same as the old
 // dedicated endpoint did). Throws ApiError(402) if the free-plan 15-swipe
@@ -11,13 +12,13 @@ import { useAuth } from './AuthContext';
 const SwipesContext = createContext(null);
 
 export function SwipesProvider({ children }) {
-  const { token, user } = useAuth();
+  const { token } = useAuth();
   // null = not loaded yet; -1 = unlimited (Plus/Pro); ≥0 = remaining today
   const [swipesRemaining, setSwipesRemaining] = useState(null);
   const [swipesCap, setSwipesCap] = useState(15);
 
   const fetchCount = useCallback(async () => {
-    if (!token || user?.role !== 'tenant') return;
+    if (!token) return;
     try {
       const data = await api.get('/me/swipe-count', token);
       setSwipesRemaining(data.remaining ?? null);
@@ -25,7 +26,7 @@ export function SwipesProvider({ children }) {
     } catch {
       // non-fatal — count display is best-effort
     }
-  }, [token, user?.role]);
+  }, [token]);
 
   useEffect(() => { fetchCount(); }, [fetchCount]);
 

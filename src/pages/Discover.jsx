@@ -95,7 +95,7 @@ export default function Discover() {
       </div>
       <p style={styles.subtitle}>{subtitle}</p>
 
-      {user?.plan === 'free' && swipesRemaining !== null && swipesRemaining >= 0 && (
+      {swipesRemaining !== null && swipesRemaining >= 0 && (
         <div style={styles.swipeCountBar}>
           <div style={{ ...styles.swipeCountFill, width: `${Math.round((swipesRemaining / swipesCap) * 100)}%` }} />
           <span style={styles.swipeCountText}>
