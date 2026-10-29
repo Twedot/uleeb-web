@@ -41,6 +41,7 @@ export default function AddProperty() {
   const [pinLat, setPinLat] = useState(null);
   const [pinLng, setPinLng] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(null); // null = idle, 0-100 = uploading
   const [error, setError] = useState(null);
 
   const [attempted, setAttempted] = useState(false);
@@ -73,28 +74,33 @@ export default function AddProperty() {
   async function handleSubmit() {
     if (!canSubmit) { setAttempted(true); return; }
     setSubmitting(true);
+    setUploadProgress(0);
     setError(null);
     try {
-      await addProperty({
-        title: title.trim(),
-        location: location.trim(),
-        state,
-        country: country.trim(),
-        price: Number(price) || 0,
-        bedrooms: Number(bedrooms) || 0,
-        sizeSqm: Number(size) || 0,
-        amenities,
-        agencyFee: agencyFeeOn ? (Number(agencyFee) || 0) : null,
-        extraCharges: extraCharges.filter((c) => c.name.trim()).map((c) => ({ name: c.name.trim(), amount: Number(c.amount) || 0 })),
-        photos,
-        video,
-        document,
-        lat: pinLat ?? undefined,
-        lng: pinLng ?? undefined,
-      });
+      await addProperty(
+        {
+          title: title.trim(),
+          location: location.trim(),
+          state,
+          country: country.trim(),
+          price: Number(price) || 0,
+          bedrooms: Number(bedrooms) || 0,
+          sizeSqm: Number(size) || 0,
+          amenities,
+          agencyFee: agencyFeeOn ? (Number(agencyFee) || 0) : null,
+          extraCharges: extraCharges.filter((c) => c.name.trim()).map((c) => ({ name: c.name.trim(), amount: Number(c.amount) || 0 })),
+          photos,
+          video,
+          document,
+          lat: pinLat ?? undefined,
+          lng: pinLng ?? undefined,
+        },
+        (pct) => setUploadProgress(pct),
+      );
       navigate('/properties', { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not list this property. Please try again.');
+      setUploadProgress(null);
     } finally {
       setSubmitting(false);
     }
@@ -258,9 +264,24 @@ export default function AddProperty() {
         {error && <p style={styles.error}>{error}</p>}
 
         <button type="button" style={{ ...styles.submitBtn, ...((submitting) ? { opacity: 0.4, cursor: 'default' } : null) }} onClick={handleSubmit} disabled={submitting}>
-          {submitting ? 'Listing…' : 'List this property'}
+          {submitting ? 'Uploading…' : 'List this property'}
         </button>
       </div>
+
+      {uploadProgress !== null && (
+        <div style={styles.uploadOverlay}>
+          <div style={styles.uploadCard}>
+            <p style={styles.uploadTitle}>Listing your property</p>
+            <p style={styles.uploadStep}>
+              {uploadProgress === 0 ? 'Saving listing details…' : 'Uploading photos & media…'}
+            </p>
+            <div style={styles.progressTrack}>
+              <div style={{ ...styles.progressFill, width: `${uploadProgress}%` }} />
+            </div>
+            <p style={styles.uploadPct}>{uploadProgress}%</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -336,5 +357,34 @@ const styles = {
     background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: '#FFFFFF',
     fontSize: 15, fontWeight: 600, cursor: 'pointer', marginTop: 8,
     boxShadow: '0 4px 16px rgba(15,23,42,0.20)',
+  },
+  uploadOverlay: {
+    position: 'fixed', inset: 0, zIndex: 9999,
+    background: 'rgba(15,23,42,0.72)', backdropFilter: 'blur(6px)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    padding: '0 24px',
+  },
+  uploadCard: {
+    background: '#FFFFFF', borderRadius: 24, padding: '36px 32px 32px',
+    width: '100%', maxWidth: 380, boxShadow: '0 24px 64px rgba(15,23,42,0.28)',
+    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
+  },
+  uploadTitle: {
+    fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 18,
+    color: '#0F172A', textAlign: 'center',
+  },
+  uploadStep: { fontSize: 13.5, color: '#475569', textAlign: 'center' },
+  progressTrack: {
+    width: '100%', height: 10, borderRadius: 999,
+    background: '#E2E8F0', overflow: 'hidden', marginTop: 6,
+  },
+  progressFill: {
+    height: '100%', borderRadius: 999,
+    background: 'linear-gradient(90deg, #2563EB 0%, #3B82F6 100%)',
+    transition: 'width 0.3s ease',
+  },
+  uploadPct: {
+    fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 28,
+    color: '#2563EB', marginTop: 4,
   },
 };

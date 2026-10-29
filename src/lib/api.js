@@ -49,4 +49,37 @@ export const api = {
   postForm: (path, formData, token) => request(path, { method: 'POST', formData, token }),
 };
 
+// XHR-based multipart upload so callers can track real upload progress
+// via onProgress(0-100). fetch has no upload progress event.
+export function postFormWithProgress(path, formData, token, onProgress) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `${BASE_URL}${path}`);
+    if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && onProgress) {
+        onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    };
+
+    xhr.onload = () => {
+      const isJSON = xhr.getResponseHeader('content-type')?.includes('application/json');
+      let data = null;
+      if (isJSON) {
+        try { data = JSON.parse(xhr.responseText); } catch { /* ignore */ }
+      }
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(data);
+      } else {
+        const message = data?.error ?? `Request failed (${xhr.status})`;
+        reject(new ApiError(xhr.status, message));
+      }
+    };
+
+    xhr.onerror = () => reject(new ApiError(0, "Can't reach the server — check your connection."));
+    xhr.send(formData);
+  });
+}
+
 export { BASE_URL };

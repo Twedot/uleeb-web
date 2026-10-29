@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { api } from '../lib/api';
+import { api, postFormWithProgress } from '../lib/api';
 import { useAuth } from './AuthContext';
 
 // Landlord's own listings — mirrors uleeb mobile's store/properties.tsx,
@@ -36,15 +36,15 @@ export function PropertiesProvider({ children }) {
   // addProperty (against the just-created property) and EditProperty
   // (against an existing one); only ever called when there's actually
   // something new to send.
-  async function uploadMedia(id, { photos = [], video, document } = {}) {
+  async function uploadMedia(id, { photos = [], video, document } = {}, onProgress) {
     const form = new FormData();
     photos.forEach((file) => form.append('photos', file));
     if (video) form.append('video', video);
     if (document) form.append('document', document);
-    return api.postForm(`/properties/${id}/media`, form, token);
+    return postFormWithProgress(`/properties/${id}/media`, form, token, onProgress);
   }
 
-  async function addProperty(input) {
+  async function addProperty(input, onProgress) {
     if (!token) throw new Error('Not signed in');
 
     const created = await api.post(
@@ -66,7 +66,7 @@ export function PropertiesProvider({ children }) {
     );
 
     if (input.photos.length > 0 || input.video || input.document) {
-      const withMedia = await uploadMedia(created.id, input);
+      const withMedia = await uploadMedia(created.id, input, onProgress);
       setProperties((prev) => [withMedia, ...prev]);
       return withMedia;
     }
