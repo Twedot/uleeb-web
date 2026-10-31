@@ -178,9 +178,11 @@ export default function Chat() {
       </div>
 
       {/* Rating section — shown to tenant on accepted or closed request */}
-      {detail && !detail.isLandlord && (detail.status === 'accepted' || detail.status === 'closed') && myRating !== null && (
+      {detail && !detail.isLandlord && (detail.status === 'accepted' || detail.status === 'closed') && (
         <div style={styles.ratingSection}>
-          {myRating === 0 ? (
+          {myRating === null ? (
+            <p style={styles.ratingNote}>Loading…</p>
+          ) : myRating === 0 ? (
             <>
               <p style={styles.ratingPrompt}>Rate {detail.otherPartyName.split(' ')[0]}'s service</p>
               <div style={styles.starsRow}>

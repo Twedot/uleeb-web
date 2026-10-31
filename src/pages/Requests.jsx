@@ -135,7 +135,11 @@ function TenantSentRequests() {
                     key={item.id}
                     item={item}
                     isLast={i === group.items.length - 1}
-                    onClick={() => navigate(`/property/${item.propertyId}`)}
+                    onClick={() =>
+                      item.status === 'accepted' || item.status === 'closed'
+                        ? navigate(`/chat/${item.id}`)
+                        : navigate(`/property/${item.propertyId}`)
+                    }
                   />
                 ))}
               </div>
@@ -180,7 +184,7 @@ function SentRequestRow({ item, isLast, onClick }) {
       </div>
       {isRented && <span style={{ ...styles.statusChip, background: '#F3E8FF', color: '#7C3AED' }}>Rented</span>}
       {!isRented && isPending && <span style={styles.newChip}>Pending</span>}
-      {!isRented && isAccepted && <span style={{ ...styles.statusChip, background: '#D1FAE5', color: '#15803D' }}>Accepted</span>}
+      {!isRented && isAccepted && <span style={{ ...styles.statusChip, background: '#D1FAE5', color: '#15803D' }}>Chat →</span>}
       {!isRented && isDeclined && <span style={{ ...styles.statusChip, background: '#F1F5F9', color: '#94A3B8' }}>Declined</span>}
     </button>
   );
