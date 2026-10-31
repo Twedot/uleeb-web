@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useGoBack } from '../hooks/useGoBack';
 import { useBookmarks } from '../context/BookmarksContext';
 import { ChevronLeftIcon, HomeIcon, XIcon } from '../components/icons';
 
@@ -6,6 +7,7 @@ import { ChevronLeftIcon, HomeIcon, XIcon } from '../components/icons';
 export default function SavedHomes() {
   const { bookmarks, loading, toggleBookmark } = useBookmarks();
   const navigate = useNavigate();
+  const goBack = useGoBack('/');
 
   async function handleRemove(id) {
     try {
@@ -17,7 +19,7 @@ export default function SavedHomes() {
 
   return (
     <div style={styles.screen}>
-      <button type="button" onClick={() => navigate(-1)} style={styles.backLink}>
+      <button type="button" onClick={() => goBack()} style={styles.backLink}>
         <ChevronLeftIcon size={14} color="#475569" /> Back
       </button>
       <h1 style={styles.title}>Saved homes</h1>

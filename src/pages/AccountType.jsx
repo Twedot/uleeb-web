@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGoBack } from '../hooks/useGoBack';
 import { useAuth, postAuthRoute, isRoleVerified } from '../context/AuthContext';
 import { HomeIcon, KeyIcon } from '../components/icons';
 import '../styles/auth.css';
@@ -19,6 +20,7 @@ const OPTIONS = [
 export default function AccountType() {
   const { user, setRole } = useAuth();
   const navigate = useNavigate();
+  const goBack = useGoBack('/');
   const isSwitching = !!user?.role;
   const [selected, setSelected] = useState(user?.role ?? null);
   const [saving, setSaving] = useState(false);
@@ -33,7 +35,7 @@ export default function AccountType() {
     const targetRole = selectedOption.role;
 
     if (targetRole === user?.role) {
-      navigate(-1);
+      goBack();
       return;
     }
 

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGoBack } from '../hooks/useGoBack';
 import { useProperties } from '../context/PropertiesContext';
 import { ChevronLeftIcon, UploadIcon, FileIcon, XIcon } from '../components/icons';
 import { MapPicker } from '../components/MapPicker';
@@ -22,6 +23,7 @@ const MIN_PHOTOS = 5;
 export default function AddProperty() {
   const { properties: myProperties, addProperty } = useProperties();
   const navigate = useNavigate();
+  const goBack = useGoBack('/properties');
   const isFirstProperty = myProperties.length === 0;
 
   const [title, setTitle] = useState('');
@@ -109,7 +111,7 @@ export default function AddProperty() {
   return (
     <div style={styles.screen}>
       <div style={styles.header}>
-        <button type="button" style={styles.backLink} onClick={() => navigate(-1)}>
+        <button type="button" style={styles.backLink} onClick={() => goBack()}>
           <ChevronLeftIcon size={14} color="#475569" /> Back
         </button>
         {isFirstProperty && (

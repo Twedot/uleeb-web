@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useGoBack } from '../hooks/useGoBack';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationsContext';
 import { BellIcon, ChevronLeftIcon, CheckIcon, HomeIcon, XIcon } from '../components/icons';
@@ -53,6 +54,7 @@ function NotifIcon({ type }) {
 
 export default function Notifications() {
   const navigate = useNavigate();
+  const goBack = useGoBack('/');
   const { user } = useAuth();
   const { notifications, loading, markRead, markAllRead } = useNotifications();
 
@@ -75,7 +77,7 @@ export default function Notifications() {
   return (
     <div style={styles.screen}>
       <div style={styles.header}>
-        <button type="button" style={styles.backBtn} onClick={() => navigate(-1)}>
+        <button type="button" style={styles.backBtn} onClick={() => goBack()}>
           <ChevronLeftIcon size={15} />
         </button>
         <div style={styles.titleRow}>

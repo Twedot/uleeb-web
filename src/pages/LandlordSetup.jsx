@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGoBack } from '../hooks/useGoBack';
 import { useAuth, postAuthRoute } from '../context/AuthContext';
 import { PhoneInput, isPhoneInputValid, phoneInputToE164 } from '../components/PhoneInput';
 import { ChevronLeftIcon } from '../components/icons';
@@ -18,6 +19,7 @@ function readLandlordSaved() {
 export default function LandlordSetup() {
   const { user, updateProfile } = useAuth();
   const navigate = useNavigate();
+  const goBack = useGoBack('/');
 
   // Frozen at mount — user.phone being set mid-flow must not collapse the array
   const STEPS = useRef(
@@ -114,7 +116,7 @@ export default function LandlordSetup() {
 
   function back() {
     if (step > 0) setStep(step - 1);
-    else navigate(-1);
+    else goBack();
   }
 
   return (

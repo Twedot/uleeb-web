@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useGoBack } from '../hooks/useGoBack';
 import { CheckIcon, ChevronLeftIcon } from '../components/icons';
 
 // Web counterpart to uleeb mobile's app/trust.tsx — static content, no
@@ -20,10 +21,11 @@ const SECTIONS = [
 
 export default function Trust() {
   const navigate = useNavigate();
+  const goBack = useGoBack('/');
 
   return (
     <div style={styles.screen}>
-      <button type="button" onClick={() => navigate(-1)} style={styles.backLink}>
+      <button type="button" onClick={() => goBack()} style={styles.backLink}>
         <ChevronLeftIcon size={14} color="#475569" /> Back
       </button>
       <h1 style={styles.title}>Verification</h1>

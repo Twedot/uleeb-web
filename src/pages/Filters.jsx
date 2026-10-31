@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGoBack } from '../hooks/useGoBack';
 import { useAuth } from '../context/AuthContext';
 import { useFilters } from '../context/FiltersContext';
 import { api } from '../lib/api';
@@ -8,6 +9,7 @@ import { NIGERIAN_STATES } from '../lib/nigeria';
 
 export default function Filters() {
   const navigate = useNavigate();
+  const goBack = useGoBack('/');
   const { user, token } = useAuth();
   const { selectedStates, allNigeria, setSelectedStates, setAllNigeria, selectedCountry, setSelectedCountry } =
     useFilters();
@@ -58,7 +60,7 @@ export default function Filters() {
   return (
     <div style={styles.screen}>
       <div style={styles.header}>
-        <button type="button" style={styles.backBtn} onClick={() => navigate(-1)}>
+        <button type="button" style={styles.backBtn} onClick={() => goBack()}>
           <ChevronLeftIcon size={15} />
         </button>
         <h1 style={styles.title}>Filter by location</h1>
@@ -142,7 +144,7 @@ export default function Filters() {
       </div>
 
       <div style={styles.footer}>
-        <button type="button" style={styles.applyBtn} onClick={() => navigate(-1)}>
+        <button type="button" style={styles.applyBtn} onClick={() => goBack()}>
           {filterActive
             ? `Show homes in ${selectedStates.join(', ')}`
             : allNigeria

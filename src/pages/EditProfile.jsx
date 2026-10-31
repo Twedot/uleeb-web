@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGoBack } from '../hooks/useGoBack';
 import { useAuth } from '../context/AuthContext';
 import { PhoneInput, phoneInputFromStored, phoneInputToE164 } from '../components/PhoneInput';
 import { ChevronLeftIcon, PinIcon } from '../components/icons';
@@ -14,6 +15,7 @@ const LANDLORD_TYPES = ['Individual landlord', 'Property agent', 'Property manag
 export default function EditProfile() {
   const { user, updateProfile } = useAuth();
   const navigate = useNavigate();
+  const goBack = useGoBack('/');
   const isLandlord = user?.role === 'landlord';
 
   const [name, setName] = useState(user?.name ?? '');
@@ -61,7 +63,7 @@ export default function EditProfile() {
         phone: phoneInputToE164(phone) || undefined,
         email: email.trim() || undefined,
       });
-      navigate(-1);
+      goBack();
     } catch (err) {
       window.alert(err instanceof Error ? err.message : 'Could not save your profile — please try again.');
     } finally {
@@ -71,7 +73,7 @@ export default function EditProfile() {
 
   return (
     <div style={styles.screen}>
-      <button type="button" onClick={() => navigate(-1)} style={styles.backLink}>
+      <button type="button" onClick={() => goBack()} style={styles.backLink}>
         <ChevronLeftIcon size={14} color="#475569" /> Back
       </button>
       <h1 style={styles.title}>Edit profile</h1>

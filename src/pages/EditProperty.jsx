@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useGoBack } from '../hooks/useGoBack';
 import { useProperties } from '../context/PropertiesContext';
 import { ChevronLeftIcon, UploadIcon, FileIcon, XIcon } from '../components/icons';
 import { MapPicker } from '../components/MapPicker';
@@ -22,6 +23,7 @@ const MIN_PHOTOS = 5;
 export default function EditProperty() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const goBack = useGoBack('/properties');
   const { properties, updateProperty, addPropertyMedia, setPropertyPhotos } = useProperties();
   const original = properties.find((p) => p.id === id);
 
@@ -126,7 +128,7 @@ export default function EditProperty() {
   return (
     <div style={styles.screen}>
       <div style={styles.header}>
-        <button type="button" style={styles.backLink} onClick={() => navigate(-1)}>
+        <button type="button" style={styles.backLink} onClick={() => goBack()}>
           <ChevronLeftIcon size={14} color="#475569" /> Back
         </button>
       </div>

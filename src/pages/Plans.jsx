@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useGoBack } from '../hooks/useGoBack';
 import { useAuth } from '../context/AuthContext';
 import { ChevronLeftIcon, CheckIcon } from '../components/icons';
 
@@ -79,6 +80,7 @@ const LANDLORD_TIERS = [
 export default function Plans() {
   const { user, initiateUpgrade, verifyUpgrade } = useAuth();
   const navigate = useNavigate();
+  const goBack = useGoBack('/');
   const [searchParams, setSearchParams] = useSearchParams();
   const [working, setWorking] = useState(null);
   const [verifying, setVerifying] = useState(false);
@@ -113,7 +115,7 @@ export default function Plans() {
   return (
     <div style={s.page}>
       <div style={s.inner}>
-        <button type="button" onClick={() => navigate(-1)} style={s.backBtn}>
+        <button type="button" onClick={() => goBack()} style={s.backBtn}>
           <ChevronLeftIcon size={14} color="#94A3B8" />
           <span>Back</span>
         </button>

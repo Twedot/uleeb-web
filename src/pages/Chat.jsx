@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useGoBack } from '../hooks/useGoBack';
 import { useAuth } from '../context/AuthContext';
 import { useRequestThread } from '../lib/useRequestThread';
 import { CalendarIcon, CheckIcon, ChevronLeftIcon, PhoneIcon, WhatsAppIcon, XIcon } from '../components/icons';
@@ -39,6 +40,7 @@ function parseTimeSlot(slot) {
 export default function Chat() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const goBack = useGoBack('/requests');
   const { user, token } = useAuth();
   const { detail, messages, loading, error, sendMessage, scheduleInspection } = useRequestThread(id, token);
 
@@ -100,7 +102,7 @@ export default function Chat() {
     return (
       <div style={{ ...styles.screen, ...styles.centered }}>
         <p style={styles.errorText}>{error ?? "This conversation couldn't be found."}</p>
-        <button type="button" style={styles.backBtnWide} onClick={() => navigate(-1)}>Go back</button>
+        <button type="button" style={styles.backBtnWide} onClick={() => goBack()}>Go back</button>
       </div>
     );
   }
@@ -115,7 +117,7 @@ export default function Chat() {
   return (
     <div style={styles.screen}>
       <div style={styles.header}>
-        <button type="button" onClick={() => navigate(-1)} style={styles.iconBtn}>
+        <button type="button" onClick={() => goBack()} style={styles.iconBtn}>
           <ChevronLeftIcon size={14} />
         </button>
         <div style={styles.headerAvatar}>

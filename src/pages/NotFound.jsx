@@ -1,8 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useGoBack } from '../hooks/useGoBack';
 import { useAuth } from '../context/AuthContext';
 
 export default function NotFound() {
   const navigate = useNavigate();
+  const goBack = useGoBack('/');
   const { user } = useAuth();
 
   return (
@@ -22,7 +24,7 @@ export default function NotFound() {
         </p>
 
         <div style={s.actions}>
-          <button type="button" onClick={() => navigate(-1)} style={s.backBtn}>
+          <button type="button" onClick={() => goBack()} style={s.backBtn}>
             ← Go back
           </button>
           <Link to={user ? '/discover' : '/'} style={s.homeBtn}>

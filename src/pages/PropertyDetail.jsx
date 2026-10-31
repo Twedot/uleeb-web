@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useGoBack } from '../hooks/useGoBack';
 import { useListings } from '../context/ListingsContext';
 import { useBookmarks } from '../context/BookmarksContext';
 import { useSentRequests } from '../context/SentRequestsContext';
@@ -22,6 +23,7 @@ const sk = {
 export default function PropertyDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const goBack = useGoBack('/');
   const { listings, loading } = useListings();
   const { isBookmarked, toggleBookmark } = useBookmarks();
   const { sentRequests, sendRequest, getStatusFor } = useSentRequests();
@@ -66,7 +68,7 @@ export default function PropertyDetail() {
     return (
       <div style={styles.notFound}>
         <p style={{ color: '#475569' }}>This listing isn't available right now.</p>
-        <button type="button" style={styles.backLink} onClick={() => navigate(-1)}>Go back</button>
+        <button type="button" style={styles.backLink} onClick={() => goBack()}>Go back</button>
       </div>
     );
   }
@@ -91,7 +93,7 @@ export default function PropertyDetail() {
   return (
     <>
     <div style={styles.screen}>
-      <button type="button" onClick={() => navigate(-1)} style={styles.backLinkTop}>
+      <button type="button" onClick={() => goBack()} style={styles.backLinkTop}>
         <ChevronLeftIcon size={14} color="#475569" /> Back
       </button>
       <div className="uleeb-detail-layout" style={styles.layout}>

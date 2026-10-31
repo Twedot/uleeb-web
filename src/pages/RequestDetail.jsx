@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useRequests } from '../context/RequestsContext';
 import { CheckIcon, ChevronLeftIcon } from '../components/icons';
+import { useGoBack } from '../hooks/useGoBack';
 
 // Web counterpart to uleeb mobile's app/(tabs)/requests/[id].tsx — the
 // landlord's side of a request: applicant fact sheet, accept/decline,
@@ -9,6 +10,7 @@ import { CheckIcon, ChevronLeftIcon } from '../components/icons';
 export default function RequestDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const goBack = useGoBack('/requests');
   const { getRequest, acceptRequest, declineRequest } = useRequests();
   const item = getRequest(id);
   const [working, setWorking] = useState(false);
@@ -32,7 +34,7 @@ export default function RequestDetail() {
     setWorking(true);
     try {
       await declineRequest(item.id);
-      navigate(-1);
+      goBack();
     } catch (err) {
       window.alert(err instanceof Error ? err.message : 'Could not decline this request. Please try again.');
       setWorking(false);
@@ -42,7 +44,7 @@ export default function RequestDetail() {
   return (
     <div style={styles.screen}>
       <div style={styles.header}>
-        <button type="button" onClick={() => navigate(-1)} style={styles.backBtn}>
+        <button type="button" onClick={goBack} style={styles.backBtn}>
           <ChevronLeftIcon size={15} />
         </button>
         <h1 style={styles.title}>Request</h1>
