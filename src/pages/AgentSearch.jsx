@@ -2,7 +2,12 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useGoBack } from '../hooks/useGoBack';
-import { agents } from '../lib/api';
+import { agents, BASE_URL } from '../lib/api';
+
+function photoSrc(raw) {
+  if (!raw) return null;
+  return raw.startsWith('http') ? raw : `${BASE_URL}${raw}`;
+}
 import { ChevronLeftIcon } from '../components/icons';
 
 function StarRow({ sum, count, size = 12 }) {

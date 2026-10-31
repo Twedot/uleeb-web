@@ -125,7 +125,7 @@ function SearchBar() {
                 {properties.slice(0, 5).map((p) => (
                   <button key={p.id} type="button" style={ss.row} onClick={() => go(`/property/${p.id}`)}>
                     {p.photos?.[0]
-                      ? <img src={`${BASE_URL}${p.photos[0]}`} alt="" style={ss.thumb} onError={(e) => { e.target.style.display = 'none'; }} />
+                      ? <img src={p.photos[0].startsWith('http') ? p.photos[0] : `${BASE_URL}${p.photos[0]}`} alt="" style={ss.thumb} onError={(e) => { e.target.style.display = 'none'; }} />
                       : <div style={ss.thumbBlank} />}
                     <div style={ss.rowStack}>
                       <span style={ss.rowText}>{p.title}</span>
