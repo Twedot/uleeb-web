@@ -69,12 +69,12 @@ export default function Chat() {
 
   // Load existing rating once we know the request is accepted/closed and user is tenant
   useEffect(() => {
-    if (!detail || detail.isLandlord) return;
+    if (!detail || user?.role === 'landlord') return;
     if (detail.status !== 'accepted' && detail.status !== 'closed') return;
     ratingsApi.myRating(id, token)
       .then((r) => setMyRating(r?.score ?? 0))
       .catch(() => setMyRating(0)); // 404 = not yet rated
-  }, [detail, id, token]);
+  }, [detail, id, token, user]);
 
   async function submitRating(score) {
     setSubmittingRating(true);
@@ -178,7 +178,7 @@ export default function Chat() {
       </div>
 
       {/* Rating section — shown to tenant on accepted or closed request */}
-      {detail && !detail.isLandlord && (detail.status === 'accepted' || detail.status === 'closed') && (
+      {detail && user?.role !== 'landlord' && (detail.status === 'accepted' || detail.status === 'closed') && (
         <div style={styles.ratingSection}>
           {myRating === null ? (
             <p style={styles.ratingNote}>Loading…</p>
