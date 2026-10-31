@@ -215,6 +215,33 @@ export default function PropertyDetail() {
             </div>
           )}
 
+          {isPro && (item.landlordName || item.landlordRatingCount > 0) && (
+            <div style={styles.landlordCard}>
+              <p style={{ ...styles.label, marginTop: 0, marginBottom: 10 }}>Listed by</p>
+              <div style={styles.landlordRow}>
+                <div style={styles.landlordAvatar}>{item.landlordName?.charAt(0)?.toUpperCase()}</div>
+                <div style={styles.landlordInfo}>
+                  <span style={styles.landlordName}>{item.landlordName}</span>
+                  {item.landlordRatingCount > 0 && (
+                    <div style={styles.landlordRating}>
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <span key={n} style={{ fontSize: 13, color: (item.landlordRatingSum / item.landlordRatingCount) >= n ? '#F59E0B' : '#CBD5E1' }}>★</span>
+                      ))}
+                      <span style={styles.landlordRatingText}>
+                        {(item.landlordRatingSum / item.landlordRatingCount).toFixed(1)} ({item.landlordRatingCount})
+                      </span>
+                    </div>
+                  )}
+                </div>
+                {item.landlordId && (
+                  <button type="button" style={styles.viewAgentBtn} onClick={() => navigate(`/agents/${item.landlordId}`)}>
+                    View agent
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           <p style={styles.label}>Amenities</p>
           <div style={styles.amenitiesWrap}>
             {(item.amenities ?? []).map((a) => (
@@ -302,5 +329,21 @@ const styles = {
   messageOwnerBtn: {
     height: 42, borderRadius: 999, background: '#0F172A', border: 'none', color: '#FFFFFF',
     fontSize: 13.5, fontWeight: 600, cursor: 'pointer', alignSelf: 'flex-start', padding: '0 20px',
+  },
+  landlordCard: {
+    background: '#FAFCFF', border: '1px solid #DBEAFE', borderRadius: 16, padding: '14px 16px', marginBottom: 4,
+  },
+  landlordRow: { display: 'flex', alignItems: 'center', gap: 12 },
+  landlordAvatar: {
+    width: 40, height: 40, borderRadius: 999, background: '#2563EB', color: '#FFFFFF',
+    fontWeight: 700, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+  },
+  landlordInfo: { flex: 1, display: 'flex', flexDirection: 'column', gap: 4 },
+  landlordName: { fontWeight: 700, fontSize: 14, color: '#0F172A' },
+  landlordRating: { display: 'flex', alignItems: 'center', gap: 2 },
+  landlordRatingText: { fontSize: 12, color: '#64748B', marginLeft: 4 },
+  viewAgentBtn: {
+    height: 34, padding: '0 14px', borderRadius: 999, border: '1.5px solid #BFDBFE',
+    background: '#FFFFFF', color: '#2563EB', fontSize: 13, fontWeight: 600, cursor: 'pointer', flexShrink: 0,
   },
 };

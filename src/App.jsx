@@ -33,6 +33,8 @@ import AppShell from './components/AppShell';
 import NotFound from './pages/NotFound';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
+import AgentSearch from './pages/AgentSearch';
+import AgentProfile from './pages/AgentProfile';
 
 function Landing() {
   return (
@@ -177,6 +179,22 @@ export default function App() {
         <Route path="/filters" element={<Filters />} />
         <Route path="/notifications" element={<Notifications />} />
       </Route>
+      <Route
+        path="/agents"
+        element={
+          <ProtectedRoute>
+            <AgentSearch />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/agents/:id"
+        element={
+          <ProtectedRoute>
+            <AgentProfile />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/terms" element={<Terms />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="*" element={<NotFound />} />

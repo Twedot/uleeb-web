@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useGoBack } from '../hooks/useGoBack';
 import { useAuth } from '../context/AuthContext';
 import { useRequestThread } from '../lib/useRequestThread';
+import { ratings as ratingsApi } from '../lib/api';
 import { CalendarIcon, CheckIcon, ChevronLeftIcon, PhoneIcon, WhatsAppIcon, XIcon } from '../components/icons';
 
 const TIME_SLOTS = ['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM'];
@@ -51,11 +52,37 @@ export default function Chat() {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [scheduling, setScheduling] = useState(false);
 
+  // Rating state — tenant can rate the landlord once per accepted request
+  const [myRating, setMyRating] = useState(null);   // null=loading, 0=not rated, 1-5=rated
+  const [hoverStar, setHoverStar] = useState(0);
+  const [submittingRating, setSubmittingRating] = useState(false);
+
   const days = nextDays(14);
   const messagesEndRef = useRef(null);
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Load existing rating once we know the request is accepted and user is tenant
+  useEffect(() => {
+    if (!detail || detail.isLandlord || detail.status !== 'accepted') return;
+    ratingsApi.myRating(id, token)
+      .then((r) => setMyRating(r?.score ?? 0))
+      .catch(() => setMyRating(0)); // 404 = not yet rated
+  }, [detail, id, token]);
+
+  async function submitRating(score) {
+    setSubmittingRating(true);
+    try {
+      await ratingsApi.rate(id, score, token);
+      setMyRating(score);
+    } catch (e) {
+      if (e.status === 409) setMyRating(score); // already rated
+      else window.alert(e.message);
+    } finally {
+      setSubmittingRating(false);
+    }
+  }
 
   async function handleSend() {
     const body = draft.trim();
@@ -131,6 +158,42 @@ export default function Chat() {
           <p style={styles.status}>{detail.propertyTitle}</p>
         </div>
       </div>
+
+      {/* Rating section — shown to tenant on an accepted request */}
+      {detail && !detail.isLandlord && detail.status === 'accepted' && myRating !== null && (
+        <div style={styles.ratingSection}>
+          {myRating === 0 ? (
+            <>
+              <p style={styles.ratingPrompt}>Rate {detail.otherPartyName.split(' ')[0]}'s service</p>
+              <div style={styles.starsRow}>
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    disabled={submittingRating}
+                    style={styles.starBtn}
+                    onMouseEnter={() => setHoverStar(n)}
+                    onMouseLeave={() => setHoverStar(0)}
+                    onClick={() => submitRating(n)}
+                  >
+                    <span style={{ fontSize: 28, color: hoverStar >= n ? '#F59E0B' : '#CBD5E1' }}>★</span>
+                  </button>
+                ))}
+              </div>
+              {submittingRating && <p style={styles.ratingNote}>Saving…</p>}
+            </>
+          ) : (
+            <div style={styles.ratingDone}>
+              <p style={styles.ratingDoneLabel}>Your rating</p>
+              <div style={styles.starsRow}>
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <span key={n} style={{ fontSize: 24, color: myRating >= n ? '#F59E0B' : '#CBD5E1' }}>★</span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <div style={styles.quickActions}>
         <button
@@ -330,4 +393,15 @@ const styles = {
   },
   chipActive: { background: '#2563EB', borderColor: '#2563EB', color: '#FFFFFF' },
   confirmBtn: { height: 50, borderRadius: 999, background: '#0F172A', color: '#FFFFFF', border: 'none', fontWeight: 700, fontSize: 14.5, cursor: 'pointer', marginTop: 24, width: '100%' },
+  // Rating section
+  ratingSection: {
+    padding: '12px 24px', borderBottom: '1px solid #DBEAFE', background: '#FEFCE8',
+    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+  },
+  ratingPrompt: { fontSize: 13, fontWeight: 600, color: '#78350F' },
+  ratingNote: { fontSize: 12, color: '#92400E' },
+  starsRow: { display: 'flex', gap: 4 },
+  starBtn: { background: 'none', border: 'none', cursor: 'pointer', padding: 2 },
+  ratingDone: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 },
+  ratingDoneLabel: { fontSize: 12, fontWeight: 600, color: '#92400E' },
 };

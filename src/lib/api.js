@@ -83,3 +83,16 @@ export function postFormWithProgress(path, formData, token, onProgress) {
 }
 
 export { BASE_URL };
+
+// --- Agents ---
+export const agents = {
+  search: (q, token) => api.get(`/agents?q=${encodeURIComponent(q ?? '')}`, token),
+  top: (token) => api.get('/agents/top', token),
+  profile: (id, token) => api.get(`/agents/${id}`, token),
+};
+
+// --- Ratings ---
+export const ratings = {
+  rate: (requestId, score, token) => api.post(`/requests/${requestId}/rate`, { score }, token),
+  myRating: (requestId, token) => api.get(`/requests/${requestId}/my-rating`, token),
+};
