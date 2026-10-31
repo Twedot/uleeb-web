@@ -84,6 +84,11 @@ export function postFormWithProgress(path, formData, token, onProgress) {
 
 export { BASE_URL };
 
+// --- Properties search ---
+export const propertiesApi = {
+  search: (q, token) => api.get(`/properties/search?q=${encodeURIComponent(q ?? '')}`, token),
+};
+
 // --- Agents ---
 export const agents = {
   search: (q, token) => api.get(`/agents?q=${encodeURIComponent(q ?? '')}`, token),
