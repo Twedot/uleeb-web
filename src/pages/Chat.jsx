@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useGoBack } from '../hooks/useGoBack';
 import { useAuth } from '../context/AuthContext';
 import { useRequestThread } from '../lib/useRequestThread';
-import { ratings as ratingsApi } from '../lib/api';
+import { ratings as ratingsApi, requestsApi } from '../lib/api';
 import { CalendarIcon, CheckIcon, ChevronLeftIcon, PhoneIcon, WhatsAppIcon, XIcon } from '../components/icons';
 
 const TIME_SLOTS = ['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM'];
@@ -43,7 +43,7 @@ export default function Chat() {
   const navigate = useNavigate();
   const goBack = useGoBack('/requests');
   const { user, token } = useAuth();
-  const { detail, messages, loading, error, sendMessage, scheduleInspection } = useRequestThread(id, token);
+  const { detail, messages, loading, error, sendMessage, scheduleInspection, refresh } = useRequestThread(id, token);
 
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
@@ -52,10 +52,14 @@ export default function Chat() {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [scheduling, setScheduling] = useState(false);
 
-  // Rating state — tenant can rate the landlord once per accepted request
+  // Rating state — tenant can rate the landlord once per accepted or closed request
   const [myRating, setMyRating] = useState(null);   // null=loading, 0=not rated, 1-5=rated
   const [hoverStar, setHoverStar] = useState(0);
   const [submittingRating, setSubmittingRating] = useState(false);
+
+  // Close request modal state
+  const [closeModalOpen, setCloseModalOpen] = useState(false);
+  const [closing, setClosing] = useState(false);
 
   const days = nextDays(14);
   const messagesEndRef = useRef(null);
@@ -63,9 +67,10 @@ export default function Chat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Load existing rating once we know the request is accepted and user is tenant
+  // Load existing rating once we know the request is accepted/closed and user is tenant
   useEffect(() => {
-    if (!detail || detail.isLandlord || detail.status !== 'accepted') return;
+    if (!detail || detail.isLandlord) return;
+    if (detail.status !== 'accepted' && detail.status !== 'closed') return;
     ratingsApi.myRating(id, token)
       .then((r) => setMyRating(r?.score ?? 0))
       .catch(() => setMyRating(0)); // 404 = not yet rated
@@ -81,6 +86,19 @@ export default function Chat() {
       else window.alert(e.message);
     } finally {
       setSubmittingRating(false);
+    }
+  }
+
+  async function closeRequest(outcome) {
+    setClosing(true);
+    try {
+      await requestsApi.close(id, outcome, token);
+      setCloseModalOpen(false);
+      await refresh();
+    } catch (e) {
+      window.alert(e.message);
+    } finally {
+      setClosing(false);
     }
   }
 
@@ -159,8 +177,8 @@ export default function Chat() {
         </div>
       </div>
 
-      {/* Rating section — shown to tenant on an accepted request */}
-      {detail && !detail.isLandlord && detail.status === 'accepted' && myRating !== null && (
+      {/* Rating section — shown to tenant on accepted or closed request */}
+      {detail && !detail.isLandlord && (detail.status === 'accepted' || detail.status === 'closed') && myRating !== null && (
         <div style={styles.ratingSection}>
           {myRating === 0 ? (
             <>
@@ -247,10 +265,24 @@ export default function Chat() {
           </div>
         )}
 
+        {detail.status === 'closed' && (
+          <div style={styles.closedBanner}>
+            <span style={styles.closedIcon}>🔒</span>
+            <span style={styles.closedText}>This request is closed. No further messages can be sent.</span>
+          </div>
+        )}
+
         <div style={styles.footer}>
-          <button type="button" style={styles.scheduleBtn} onClick={openScheduler}>
-            {inspectionLabel ? 'Reschedule inspection' : 'Schedule inspection'}
-          </button>
+          {detail.status === 'accepted' && (
+            <button type="button" style={styles.closeRequestBtn} onClick={() => setCloseModalOpen(true)}>
+              Close request
+            </button>
+          )}
+          {detail.status !== 'closed' && (
+            <button type="button" style={styles.scheduleBtn} onClick={openScheduler}>
+              {inspectionLabel ? 'Reschedule inspection' : 'Schedule inspection'}
+            </button>
+          )}
           {detail.chatEnabled && (
             <div style={styles.composer}>
               <textarea
@@ -268,6 +300,43 @@ export default function Chat() {
           )}
         </div>
       </div>
+
+      {closeModalOpen && (
+        <div style={styles.modalBackdrop} onClick={() => !closing && setCloseModalOpen(false)}>
+          <div style={styles.modalSheet} onClick={(e) => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <p style={styles.modalTitle}>Close this request</p>
+              <button type="button" onClick={() => setCloseModalOpen(false)} style={styles.iconBtn} disabled={closing}>
+                <XIcon size={14} />
+              </button>
+            </div>
+            <p style={styles.closeModalSub}>What happened with <strong>{detail.propertyTitle}</strong>?</p>
+            <div style={styles.closeOptions}>
+              <button
+                type="button"
+                disabled={closing}
+                style={styles.closeOptionRented}
+                onClick={() => closeRequest('rented')}
+              >
+                <span style={{ fontSize: 28 }}>🏠</span>
+                <span style={styles.closeOptionLabel}>Rented</span>
+                <span style={styles.closeOptionDesc}>Deal done — this property was successfully rented</span>
+              </button>
+              <button
+                type="button"
+                disabled={closing}
+                style={styles.closeOptionPassed}
+                onClick={() => closeRequest('passed')}
+              >
+                <span style={{ fontSize: 28 }}>👋</span>
+                <span style={styles.closeOptionLabel}>Passed</span>
+                <span style={styles.closeOptionDesc}>Not going through — closing without a deal</span>
+              </button>
+            </div>
+            {closing && <p style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', marginTop: 12 }}>Closing…</p>}
+          </div>
+        </div>
+      )}
 
       {schedulerOpen && (
         <div style={styles.modalBackdrop} onClick={() => setSchedulerOpen(false)}>
@@ -393,6 +462,34 @@ const styles = {
   },
   chipActive: { background: '#2563EB', borderColor: '#2563EB', color: '#FFFFFF' },
   confirmBtn: { height: 50, borderRadius: 999, background: '#0F172A', color: '#FFFFFF', border: 'none', fontWeight: 700, fontSize: 14.5, cursor: 'pointer', marginTop: 24, width: '100%' },
+  // Closed banner
+  closedBanner: {
+    display: 'flex', alignItems: 'center', gap: 10,
+    background: '#F1F5F9', borderRadius: 14, padding: '10px 14px', margin: '0 0 4px',
+    borderLeft: '3px solid #94A3B8',
+  },
+  closedIcon: { fontSize: 16, flexShrink: 0 },
+  closedText: { fontSize: 12.5, color: '#64748B', lineHeight: '18px' },
+  // Close request button
+  closeRequestBtn: {
+    height: 46, borderRadius: 999, border: '1.5px solid #FCA5A5', background: '#FEF2F2',
+    fontSize: 13.5, fontWeight: 600, color: '#DC2626', cursor: 'pointer',
+  },
+  // Close modal options
+  closeModalSub: { fontSize: 13.5, color: '#475569', marginBottom: 20, lineHeight: '20px' },
+  closeOptions: { display: 'flex', gap: 10 },
+  closeOptionRented: {
+    flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+    padding: '20px 12px', borderRadius: 18, border: '2px solid #DBEAFE',
+    background: '#F0FFF4', cursor: 'pointer',
+  },
+  closeOptionPassed: {
+    flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+    padding: '20px 12px', borderRadius: 18, border: '2px solid #DBEAFE',
+    background: '#FAFCFF', cursor: 'pointer',
+  },
+  closeOptionLabel: { fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 15, color: '#0F172A' },
+  closeOptionDesc: { fontSize: 11.5, color: '#64748B', textAlign: 'center', lineHeight: '16px' },
   // Rating section
   ratingSection: {
     padding: '12px 24px', borderBottom: '1px solid #DBEAFE', background: '#FEFCE8',

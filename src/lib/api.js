@@ -96,6 +96,11 @@ export const agents = {
   profile: (id, token) => api.get(`/agents/${id}`, token),
 };
 
+// --- Requests close ---
+export const requestsApi = {
+  close: (id, outcome, token) => api.post(`/requests/${id}/close`, { outcome }, token),
+};
+
 // --- Ratings ---
 export const ratings = {
   rate: (requestId, score, token) => api.post(`/requests/${requestId}/rate`, { score }, token),
