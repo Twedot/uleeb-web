@@ -66,7 +66,7 @@ jobs:
             set -e
             cd ~/uleeb-web
             rm -rf dist_old
-            [ -d dist ] && mv dist dist_old
+            if [ -d dist ]; then mv dist dist_old; fi
             mv dist_new dist
             rm -rf dist_old
 
