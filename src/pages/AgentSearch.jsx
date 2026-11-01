@@ -70,8 +70,8 @@ export default function AgentSearch() {
     if (!token) return;
     setTopLoading(true);
     agents.top(token)
-      .then(setTopAgents)
-      .catch((e) => setError(e?.message || 'Could not load top agents'))
+      .then((data) => { console.log('[AgentSearch] top agents:', data); setTopAgents(data); })
+      .catch((e) => { console.error('[AgentSearch] top agents error:', e); setError(e?.message || 'Could not load top agents'); })
       .finally(() => setTopLoading(false));
   }, [token]);
 
