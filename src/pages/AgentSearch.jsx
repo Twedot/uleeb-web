@@ -61,12 +61,18 @@ export default function AgentSearch() {
   const [q, setQ] = useState('');
   const [results, setResults] = useState([]);
   const [topAgents, setTopAgents] = useState([]);
+  const [topLoading, setTopLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const debounce = useRef(null);
 
   useEffect(() => {
-    agents.top(token).then(setTopAgents).catch(() => {});
+    if (!token) return;
+    setTopLoading(true);
+    agents.top(token)
+      .then(setTopAgents)
+      .catch((e) => setError(e?.message || 'Could not load top agents'))
+      .finally(() => setTopLoading(false));
   }, [token]);
 
   useEffect(() => {
@@ -83,7 +89,7 @@ export default function AgentSearch() {
   }, [q, token]);
 
   const list = q.trim() ? results : topAgents;
-  const isEmpty = !loading && list.length === 0;
+  const isEmpty = !loading && !topLoading && list.length === 0;
 
   return (
     <div style={styles.screen}>
